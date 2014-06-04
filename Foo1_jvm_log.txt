@@ -1,0 +1,1056 @@
+open file Foo1.class
+method attributes_count = 1
+method tmp->attribute_name_index = 37
+method tmp->attribute_length = 29
+method attributes_count = 1
+method tmp->attribute_name_index = 37
+method tmp->attribute_length = 878
+ConstantUTF8 = 
+cp_index[35], utf8[0], tag = 1, size = 6, <init>
+cp_index[36], utf8[1], tag = 1, size = 3, ()V
+cp_index[37], utf8[2], tag = 1, size = 4, Code
+cp_index[38], utf8[3], tag = 1, size = 15, LineNumberTable
+cp_index[39], utf8[4], tag = 1, size = 4, main
+cp_index[40], utf8[5], tag = 1, size = 22, ([Ljava/lang/String;)V
+cp_index[41], utf8[6], tag = 1, size = 10, SourceFile
+cp_index[42], utf8[7], tag = 1, size = 9, Foo1.java
+cp_index[48], utf8[8], tag = 1, size = 10, HelloWorld
+cp_index[51], utf8[9], tag = 1, size = 20, --------------------
+cp_index[52], utf8[10], tag = 1, size = 14, initial value 
+cp_index[53], utf8[11], tag = 1, size = 23, java/lang/StringBuilder
+cp_index[54], utf8[12], tag = 1, size = 18, random number x : 
+cp_index[58], utf8[13], tag = 1, size = 4, x = 
+cp_index[59], utf8[14], tag = 1, size = 4, y = 
+cp_index[60], utf8[15], tag = 1, size = 4, c = 
+cp_index[61], utf8[16], tag = 1, size = 4, d = 
+cp_index[62], utf8[17], tag = 1, size = 4, f = 
+cp_index[63], utf8[18], tag = 1, size = 12, c = x + y = 
+cp_index[64], utf8[19], tag = 1, size = 3,  + 
+cp_index[65], utf8[20], tag = 1, size = 3,  = 
+cp_index[66], utf8[21], tag = 1, size = 12, d = d + c = 
+cp_index[67], utf8[22], tag = 1, size = 10, x = c/2 = 
+cp_index[68], utf8[23], tag = 1, size = 12, c = x * y = 
+cp_index[69], utf8[24], tag = 1, size = 3,  * 
+cp_index[70], utf8[25], tag = 1, size = 12, c = x - y = 
+cp_index[71], utf8[26], tag = 1, size = 3,  - 
+cp_index[72], utf8[27], tag = 1, size = 12, c = x / y = 
+cp_index[73], utf8[28], tag = 1, size = 3,  / 
+cp_index[74], utf8[29], tag = 1, size = 15, Foo Test By WJY
+cp_index[75], utf8[30], tag = 1, size = 4, Foo1
+cp_index[76], utf8[31], tag = 1, size = 16, java/lang/Object
+cp_index[77], utf8[32], tag = 1, size = 14, java/lang/Math
+cp_index[78], utf8[33], tag = 1, size = 6, random
+cp_index[79], utf8[34], tag = 1, size = 3, ()D
+cp_index[80], utf8[35], tag = 1, size = 16, java/lang/System
+cp_index[81], utf8[36], tag = 1, size = 3, out
+cp_index[82], utf8[37], tag = 1, size = 21, Ljava/io/PrintStream;
+cp_index[83], utf8[38], tag = 1, size = 19, java/io/PrintStream
+cp_index[84], utf8[39], tag = 1, size = 7, println
+cp_index[85], utf8[40], tag = 1, size = 21, (Ljava/lang/String;)V
+cp_index[86], utf8[41], tag = 1, size = 6, append
+cp_index[87], utf8[42], tag = 1, size = 45, (Ljava/lang/String;)Ljava/lang/StringBuilder;
+cp_index[88], utf8[43], tag = 1, size = 28, (I)Ljava/lang/StringBuilder;
+cp_index[89], utf8[44], tag = 1, size = 8, toString
+cp_index[90], utf8[45], tag = 1, size = 20, ()Ljava/lang/String;
+p->integer_used = 0
+p->float_used = 0
+p->double_used = 1
+Constant Double= 
+ cp_index[3], double[0], tag = 6, size = 8, 42.00000
+p->clasz_used = 6
+Constant Class Pool= 
+ cp_index[10], class[0], tag = 7, size = 2, 53 java/lang/StringBuilder 
+ cp_index[33], class[1], tag = 7, size = 2, 75 Foo1 
+ cp_index[34], class[2], tag = 7, size = 2, 76 java/lang/Object 
+ cp_index[44], class[3], tag = 7, size = 2, 77 java/lang/Math 
+ cp_index[46], class[4], tag = 7, size = 2, 80 java/lang/System 
+ cp_index[49], class[5], tag = 7, size = 2, 83 java/io/PrintStream 
+p->stringRef_used = 21
+Constant String Reference= 
+ cp_index[6], strRef[0], tag = 8, size = 2, 48 HelloWorld 
+ cp_index[8], strRef[1], tag = 8, size = 2, 51 -------------------- 
+ cp_index[9], strRef[2], tag = 8, size = 2, 52 initial value  
+ cp_index[12], strRef[3], tag = 8, size = 2, 54 random number x :  
+ cp_index[16], strRef[4], tag = 8, size = 2, 58 x =  
+ cp_index[17], strRef[5], tag = 8, size = 2, 59 y =  
+ cp_index[18], strRef[6], tag = 8, size = 2, 60 c =  
+ cp_index[19], strRef[7], tag = 8, size = 2, 61 d =  
+ cp_index[20], strRef[8], tag = 8, size = 2, 62 f =  
+ cp_index[21], strRef[9], tag = 8, size = 2, 63 c = x + y =  
+ cp_index[22], strRef[10], tag = 8, size = 2, 64  +  
+ cp_index[23], strRef[11], tag = 8, size = 2, 65  =  
+ cp_index[24], strRef[12], tag = 8, size = 2, 66 d = d + c =  
+ cp_index[25], strRef[13], tag = 8, size = 2, 67 x = c/2 =  
+ cp_index[26], strRef[14], tag = 8, size = 2, 68 c = x * y =  
+ cp_index[27], strRef[15], tag = 8, size = 2, 69  *  
+ cp_index[28], strRef[16], tag = 8, size = 2, 70 c = x - y =  
+ cp_index[29], strRef[17], tag = 8, size = 2, 71  -  
+ cp_index[30], strRef[18], tag = 8, size = 2, 72 c = x / y =  
+ cp_index[31], strRef[19], tag = 8, size = 2, 73  /  
+ cp_index[32], strRef[20], tag = 8, size = 2, 74 Foo Test By WJY 
+p->field_used = 1
+Constant Field = 
+ cp_index[5], field[0], tag = 9, size = 4, cls 46, nat= 47 java/lang/System 
+ out 
+ Ljava/io/PrintStream; 
+p->method_used= 7
+Constant Method= 
+ cp_index[1], method[0], tag = 10, size = 4, cls 34, nat= 43 java/lang/Object 
+ <init> 
+ ()V 
+ cp_index[2], method[1], tag = 10, size = 4, cls 44, nat= 45 java/lang/Math 
+ random 
+ ()D 
+ cp_index[7], method[2], tag = 10, size = 4, cls 49, nat= 50 java/io/PrintStream 
+ println 
+ (Ljava/lang/String;)V 
+ cp_index[11], method[3], tag = 10, size = 4, cls 10, nat= 43 java/lang/StringBuilder 
+ <init> 
+ ()V 
+ cp_index[13], method[4], tag = 10, size = 4, cls 10, nat= 55 java/lang/StringBuilder 
+ append 
+ (Ljava/lang/String;)Ljava/lang/StringBuilder; 
+ cp_index[14], method[5], tag = 10, size = 4, cls 10, nat= 56 java/lang/StringBuilder 
+ append 
+ (I)Ljava/lang/StringBuilder; 
+ cp_index[15], method[6], tag = 10, size = 4, cls 10, nat= 57 java/lang/StringBuilder 
+ toString 
+ ()Ljava/lang/String; 
+Method Pool= 
+method[0], attr_count = 1, 35 <init> 
+Descriptor ()V 
+attribute name = Code
+method[1], attr_count = 1, 39 main 
+Descriptor ([Ljava/lang/String;)V 
+attribute name = Code
+Magic Number = 0xCA 0xFE 0xBA 0xBE 
+Minor Number = 0x(00) 0 
+Major Number(J2SE 6.0) = 0x(32) 50 
+Constant Pool Count = 0x(5B) 91 
+access flag = 0x(20) 32 
+this class = 0x(21) 33 
+super class = 0x(22) 34 
+interface count = 0x(00) 0 
+field count = 0x(00) 0 
+method count = 0x(02) 2 
+-------------------------------------
+Execute Simple JVM
+-------------------------------------
+-------------------------------------
+find and execute <init> method
+-------------------------------------
+attribute name = Code
+----------------------------------------
+code dump
+attribute name : Code
+attribute length: 29
+max_stack: 1
+max_locals: 1
+code_length: 5
+aload_0 
+invokespecial 
+return 
+----------------------------------------
+push 0 into stack
+call method_index 1
+----------------------------------------
+code dump
+attribute name : Code
+attribute length: 878
+max_stack: 4
+max_locals: 6
+code_length: 694
+invokestatic 
+ldc2_w 
+dmul 
+dconst_1 
+dadd 
+d2i 
+istore_1 
+sipush 
+istore_2 
+iconst_0 
+istore_3 
+sipush 
+istore 
+iconst_0 
+istore 
+getstatic 
+ldc 
+invokevirtual 
+getstatic 
+ldc 
+invokevirtual 
+getstatic 
+ldc 
+invokevirtual 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload_1 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload_1 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload_2 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload_3 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+getstatic 
+ldc 
+invokevirtual 
+iload_1 
+iload_2 
+iadd 
+istore_3 
+iload 
+iload_3 
+iadd 
+istore 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload_1 
+invokevirtual 
+ldc 
+invokevirtual 
+iload_2 
+invokevirtual 
+ldc 
+invokevirtual 
+iload_3 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+iload_3 
+iconst_2 
+idiv 
+istore_1 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload_1 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+iload_1 
+iload_2 
+imul 
+istore_3 
+iload 
+iload_3 
+iadd 
+istore 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload_1 
+invokevirtual 
+ldc 
+invokevirtual 
+iload_2 
+invokevirtual 
+ldc 
+invokevirtual 
+iload_3 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+iload_3 
+iconst_2 
+idiv 
+istore_1 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload_1 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+iload_1 
+iload_2 
+isub 
+istore_3 
+iload 
+iload_3 
+iadd 
+istore 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload_1 
+invokevirtual 
+ldc 
+invokevirtual 
+iload_2 
+invokevirtual 
+ldc 
+invokevirtual 
+iload_3 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+iload_3 
+iconst_2 
+idiv 
+istore_1 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload_1 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+iload_1 
+iload_2 
+idiv 
+istore_3 
+iload 
+iload_3 
+iadd 
+istore 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload_1 
+invokevirtual 
+ldc 
+invokevirtual 
+iload_2 
+invokevirtual 
+ldc 
+invokevirtual 
+iload_3 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+iload 
+iload_1 
+iadd 
+iload_2 
+iadd 
+iload_3 
+iadd 
+istore 
+getstatic 
+new 
+dup 
+invokespecial 
+ldc 
+invokevirtual 
+iload 
+invokevirtual 
+ldc 
+invokevirtual 
+iload_1 
+invokevirtual 
+ldc 
+invokevirtual 
+iload_2 
+invokevirtual 
+ldc 
+invokevirtual 
+iload_3 
+invokevirtual 
+ldc 
+invokevirtual 
+iload 
+invokevirtual 
+invokevirtual 
+invokevirtual 
+getstatic 
+ldc 
+invokevirtual 
+return 
+----------------------------------------
+invokestatic method_index 2
+simpleMethodPool.method_used = 2
+call class java/lang/Math
+call method random
+call method type ()D
+invoke java/lang/Math/random ()D
+rand r = 0.669515
+invoke java lang library successful
+ldc2_w: push a constant index 3 onto the stack 
+index 3
+get value from constant pool = 42.000000
+get value from stack = 0.669515
+dmul: 42.000000 * 0.669515 = 28.119633
+iconst_5: push 1.0f into stack
+get value from stack = 1.000000
+get value from stack = 28.119633
+dadd: 1.000000 + 28.119633 = 29.119633
+d2i: 29 <-- 29.119633
+istore_1: store value into local variable 1(29)
+sipush value 6345
+istore_2: store value into local variable 2(6345)
+iconst_0: push 0 into stack
+istore_3: store value into local variable 3(0)
+sipush value 23456
+istore: store value into local variable 4(23456)
+iconst_0: push 0 into stack
+istore: store value into local variable 5(0)
+getstatic 5
+ldc: push a constant index 6 onto the stack 
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 6
+HelloWorld
+getstatic 5
+ldc: push a constant index 8 onto the stack 
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 8
+--------------------
+getstatic 5
+ldc: push a constant index 9 onto the stack 
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 9
+initial value 
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 12 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 12
+iload_1: load value from local variable 1(29)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 29
+random number x : 29
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+random number x : 29
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 16 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 16
+iload_1: load value from local variable 1(29)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 29
+x = 29
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+x = 29
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 17 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 17
+iload_2: load value from local variable 2(6345)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 6345
+y = 6345
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+y = 6345
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 18 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 18
+iload_3: load value from local variable 3(0)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 0
+c = 0
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+c = 0
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 19 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 19
+iload: load value from local variable 4(23456)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 23456
+d = 23456
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+d = 23456
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 20 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 20
+iload: load value from local variable 5(0)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 0
+f = 0
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+f = 0
+getstatic 5
+ldc: push a constant index 8 onto the stack 
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 8
+--------------------
+iload_1: load value from local variable 1(29)
+iload_2: load value from local variable 2(6345)
+iadd: 6345 + 29 = 6374
+istore_3: store value into local variable 3(6374)
+iload: load value from local variable 4(23456)
+iload_3: load value from local variable 3(6374)
+iadd: 6374 + 23456 = 29830
+istore: store value into local variable 4(29830)
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 21 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 21
+iload_1: load value from local variable 1(29)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 29
+c = x + y = 29
+ldc: push a constant index 22 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 22
+iload_2: load value from local variable 2(6345)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 6345
+c = x + y = 29 + 6345
+ldc: push a constant index 23 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 23
+iload_3: load value from local variable 3(6374)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 6374
+c = x + y = 29 + 6345 = 6374
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+c = x + y = 29 + 6345 = 6374
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 24 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 24
+iload: load value from local variable 4(29830)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 29830
+d = d + c = 29830
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+d = d + c = 29830
+iload_3: load value from local variable 3(6374)
+iconst_2: push 1 into stack
+idiv: 6374 / 2 = 3187
+istore_1: store value into local variable 1(3187)
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 25 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 25
+iload_1: load value from local variable 1(3187)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 3187
+x = c/2 = 3187
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+x = c/2 = 3187
+iload_1: load value from local variable 1(3187)
+iload_2: load value from local variable 2(6345)
+imul: 6345 * 3187 = 20221515
+istore_3: store value into local variable 3(20221515)
+iload: load value from local variable 4(29830)
+iload_3: load value from local variable 3(20221515)
+iadd: 20221515 + 29830 = 20251345
+istore: store value into local variable 4(20251345)
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 26 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 26
+iload_1: load value from local variable 1(3187)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 3187
+c = x * y = 3187
+ldc: push a constant index 27 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 27
+iload_2: load value from local variable 2(6345)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 6345
+c = x * y = 3187 * 6345
+ldc: push a constant index 23 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 23
+iload_3: load value from local variable 3(20221515)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 20221515
+c = x * y = 3187 * 6345 = 20221515
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+c = x * y = 3187 * 6345 = 20221515
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 24 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 24
+iload: load value from local variable 4(20251345)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 20251345
+d = d + c = 20251345
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+d = d + c = 20251345
+iload_3: load value from local variable 3(20221515)
+iconst_2: push 1 into stack
+idiv: 20221515 / 2 = 10110757
+istore_1: store value into local variable 1(10110757)
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 25 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 25
+iload_1: load value from local variable 1(10110757)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 10110757
+x = c/2 = 10110757
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+x = c/2 = 10110757
+iload_1: load value from local variable 1(10110757)
+iload_2: load value from local variable 2(6345)
+isub : 10110757 - 6345 = 10104412
+istore_3: store value into local variable 3(10104412)
+iload: load value from local variable 4(20251345)
+iload_3: load value from local variable 3(10104412)
+iadd: 10104412 + 20251345 = 30355757
+istore: store value into local variable 4(30355757)
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 28 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 28
+iload_1: load value from local variable 1(10110757)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 10110757
+c = x - y = 10110757
+ldc: push a constant index 29 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 29
+iload_2: load value from local variable 2(6345)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 6345
+c = x - y = 10110757 - 6345
+ldc: push a constant index 23 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 23
+iload_3: load value from local variable 3(10104412)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 10104412
+c = x - y = 10110757 - 6345 = 10104412
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+c = x - y = 10110757 - 6345 = 10104412
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 24 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 24
+iload: load value from local variable 4(30355757)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 30355757
+d = d + c = 30355757
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+d = d + c = 30355757
+iload_3: load value from local variable 3(10104412)
+iconst_2: push 1 into stack
+idiv: 10104412 / 2 = 5052206
+istore_1: store value into local variable 1(5052206)
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 25 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 25
+iload_1: load value from local variable 1(5052206)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5052206
+x = c/2 = 5052206
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+x = c/2 = 5052206
+iload_1: load value from local variable 1(5052206)
+iload_2: load value from local variable 2(6345)
+idiv: 5052206 / 6345 = 796
+istore_3: store value into local variable 3(796)
+iload: load value from local variable 4(30355757)
+iload_3: load value from local variable 3(796)
+iadd: 796 + 30355757 = 30356553
+istore: store value into local variable 4(30356553)
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 30 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 30
+iload_1: load value from local variable 1(5052206)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5052206
+c = x / y = 5052206
+ldc: push a constant index 31 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 31
+iload_2: load value from local variable 2(6345)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 6345
+c = x / y = 5052206 / 6345
+ldc: push a constant index 23 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 23
+iload_3: load value from local variable 3(796)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 796
+c = x / y = 5052206 / 6345 = 796
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+c = x / y = 5052206 / 6345 = 796
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 24 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 24
+iload: load value from local variable 4(30356553)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 30356553
+d = d + c = 30356553
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+d = d + c = 30356553
+iload: load value from local variable 4(30356553)
+iload_1: load value from local variable 1(5052206)
+iadd: 5052206 + 30356553 = 35408759
+iload_2: load value from local variable 2(6345)
+iadd: 6345 + 35408759 = 35415104
+iload_3: load value from local variable 3(796)
+iadd: 796 + 35415104 = 35415900
+istore: store value into local variable 5(35415900)
+getstatic 5
+new: new object_ref 10
+dup
+call method_index 11
+ldc: push a constant index 20 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 20
+iload: load value from local variable 4(30356553)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 30356553
+f = 30356553
+ldc: push a constant index 22 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 22
+iload_1: load value from local variable 1(5052206)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5052206
+f = 30356553 + 5052206
+ldc: push a constant index 22 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 22
+iload_2: load value from local variable 2(6345)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 6345
+f = 30356553 + 5052206 + 6345
+ldc: push a constant index 22 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 22
+iload_3: load value from local variable 3(796)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 796
+f = 30356553 + 5052206 + 6345 + 796
+ldc: push a constant index 23 onto the stack 
+call object_ref 13
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 23
+iload: load value from local variable 5(35415900)
+call object_ref 14
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 35415900
+f = 30356553 + 5052206 + 6345 + 796 = 35415900
+call object_ref 15
+call object ref class java/lang/StringBuilder
+call StringBuilder with index = 5
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 5
+f = 30356553 + 5052206 + 6345 + 796 = 35415900
+getstatic 5
+ldc: push a constant index 32 onto the stack 
+call object_ref 7
+call object ref class java/io/PrintStream
+call Println with index = 32
+Foo Test By WJY
+return: 
+return: 
+-------------------------------------
+Terminate Simple JVM
+-------------------------------------

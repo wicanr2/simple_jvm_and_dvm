@@ -1,0 +1,416 @@
+Processing 'Foo1.dex'...
+Opened 'Foo1.dex', DEX version '035'
+DEX file header:
+magic               : 'dex\n035\0'
+checksum            : d4b03741
+signature           : c209...90b9
+file_size           : 2572
+header_size         : 112
+link_size           : 0
+link_off            : 0 (0x000000)
+string_ids_size     : 44
+string_ids_off      : 112 (0x000070)
+type_ids_size       : 11
+type_ids_off        : 288 (0x000120)
+field_ids_size      : 1
+field_ids_off       : 416 (0x0001a0)
+method_ids_size     : 9
+method_ids_off      : 424 (0x0001a8)
+class_defs_size     : 1
+class_defs_off      : 496 (0x0001f0)
+data_size           : 2044
+data_off            : 528 (0x000210)
+
+Class #0 header:
+class_idx           : 2
+access_flags        : 0 (0x0000)
+superclass_idx      : 5
+interfaces_off      : 0 (0x000000)
+source_file_idx     : 9
+annotations_off     : 0 (0x000000)
+class_data_off      : 2397 (0x00095d)
+static_fields_size  : 0
+instance_fields_size: 0
+direct_methods_size : 2
+virtual_methods_size: 0
+
+Class #0            -
+  Class descriptor  : 'LFoo1;'
+  Access flags      : 0x0000 ()
+  Superclass        : 'Ljava/lang/Object;'
+  Interfaces        -
+  Static fields     -
+  Instance fields   -
+  Direct methods    -
+    #0              : (in LFoo1;)
+      name          : '<init>'
+      type          : '()V'
+      access        : 0x10000 (CONSTRUCTOR)
+      code          -
+      registers     : 1
+      ins           : 1
+      outs          : 1
+      insns size    : 4 16-bit code units
+000210:                                        |[000210] Foo1.<init>:()V
+000220: 7010 0400 0000                         |0000: invoke-direct {v0}, Ljava/lang/Object;.<init>:()V // method@0004
+000226: 0e00                                   |0003: return-void
+      catches       : (none)
+      positions     : 
+        0x0000 line=2
+      locals        : 
+        0x0000 - 0x0004 reg=0 this LFoo1; 
+
+    #1              : (in LFoo1;)
+      name          : 'main'
+      type          : '([Ljava/lang/String;)V'
+      access        : 0x0009 (PUBLIC STATIC)
+      code          -
+      registers     : 9
+      ins           : 1
+      outs          : 2
+      insns size    : 626 16-bit code units
+000228:                                        |[000228] Foo1.main:([Ljava/lang/String;)V
+000238: 1206                                   |0000: const/4 v6, #int 0 // #0
+00023a: 7100 0300 0000                         |0001: invoke-static {}, Ljava/lang/Math;.random:()D // method@0003
+000240: 0b00                                   |0004: move-result-wide v0
+000242: 1902 4540                              |0005: const-wide/high16 v2, #long 4631107791820423168 // #4045
+000246: cd20                                   |0007: mul-double/2addr v0, v2
+000248: 1902 f03f                              |0008: const-wide/high16 v2, #long 4607182418800017408 // #3ff0
+00024c: cb20                                   |000a: add-double/2addr v0, v2
+00024e: 8a00                                   |000b: double-to-int v0, v0
+000250: 1301 c918                              |000c: const/16 v1, #int 6345 // #18c9
+000254: 1302 a05b                              |000e: const/16 v2, #int 23456 // #5ba0
+000258: 6203 0000                              |0010: sget-object v3, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+00025c: 1a04 0a00                              |0012: const-string v4, "HelloWorld" // string@000a
+000260: 6e20 0200 4300                         |0014: invoke-virtual {v3, v4}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+000266: 6203 0000                              |0017: sget-object v3, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+00026a: 1a04 0500                              |0019: const-string v4, "--------------------" // string@0005
+00026e: 6e20 0200 4300                         |001b: invoke-virtual {v3, v4}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+000274: 6203 0000                              |001e: sget-object v3, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+000278: 1a04 2200                              |0020: const-string v4, "initial value " // string@0022
+00027c: 6e20 0200 4300                         |0022: invoke-virtual {v3, v4}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+000282: 6203 0000                              |0025: sget-object v3, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+000286: 2204 0700                              |0027: new-instance v4, Ljava/lang/StringBuilder; // type@0007
+00028a: 7010 0500 0400                         |0029: invoke-direct {v4}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+000290: 1a05 2700                              |002c: const-string v5, "random number x : " // string@0027
+000294: 6e20 0700 5400                         |002e: invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+00029a: 0c04                                   |0031: move-result-object v4
+00029c: 6e20 0600 0400                         |0032: invoke-virtual {v4, v0}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+0002a2: 0c04                                   |0035: move-result-object v4
+0002a4: 6e10 0800 0400                         |0036: invoke-virtual {v4}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+0002aa: 0c04                                   |0039: move-result-object v4
+0002ac: 6e20 0200 4300                         |003a: invoke-virtual {v3, v4}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+0002b2: 6203 0000                              |003d: sget-object v3, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+0002b6: 2204 0700                              |003f: new-instance v4, Ljava/lang/StringBuilder; // type@0007
+0002ba: 7010 0500 0400                         |0041: invoke-direct {v4}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+0002c0: 1a05 2900                              |0044: const-string v5, "x = " // string@0029
+0002c4: 6e20 0700 5400                         |0046: invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+0002ca: 0c04                                   |0049: move-result-object v4
+0002cc: 6e20 0600 0400                         |004a: invoke-virtual {v4, v0}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+0002d2: 0c04                                   |004d: move-result-object v4
+0002d4: 6e10 0800 0400                         |004e: invoke-virtual {v4}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+0002da: 0c04                                   |0051: move-result-object v4
+0002dc: 6e20 0200 4300                         |0052: invoke-virtual {v3, v4}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+0002e2: 6203 0000                              |0055: sget-object v3, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+0002e6: 2204 0700                              |0057: new-instance v4, Ljava/lang/StringBuilder; // type@0007
+0002ea: 7010 0500 0400                         |0059: invoke-direct {v4}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+0002f0: 1a05 2b00                              |005c: const-string v5, "y = " // string@002b
+0002f4: 6e20 0700 5400                         |005e: invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+0002fa: 0c04                                   |0061: move-result-object v4
+0002fc: 6e20 0600 1400                         |0062: invoke-virtual {v4, v1}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+000302: 0c04                                   |0065: move-result-object v4
+000304: 6e10 0800 0400                         |0066: invoke-virtual {v4}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+00030a: 0c04                                   |0069: move-result-object v4
+00030c: 6e20 0200 4300                         |006a: invoke-virtual {v3, v4}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+000312: 6203 0000                              |006d: sget-object v3, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+000316: 2204 0700                              |006f: new-instance v4, Ljava/lang/StringBuilder; // type@0007
+00031a: 7010 0500 0400                         |0071: invoke-direct {v4}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+000320: 1a05 1a00                              |0074: const-string v5, "c = " // string@001a
+000324: 6e20 0700 5400                         |0076: invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+00032a: 0c04                                   |0079: move-result-object v4
+00032c: 6e20 0600 6400                         |007a: invoke-virtual {v4, v6}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+000332: 0c04                                   |007d: move-result-object v4
+000334: 6e10 0800 0400                         |007e: invoke-virtual {v4}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+00033a: 0c04                                   |0081: move-result-object v4
+00033c: 6e20 0200 4300                         |0082: invoke-virtual {v3, v4}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+000342: 6203 0000                              |0085: sget-object v3, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+000346: 2204 0700                              |0087: new-instance v4, Ljava/lang/StringBuilder; // type@0007
+00034a: 7010 0500 0400                         |0089: invoke-direct {v4}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+000350: 1a05 1f00                              |008c: const-string v5, "d = " // string@001f
+000354: 6e20 0700 5400                         |008e: invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+00035a: 0c04                                   |0091: move-result-object v4
+00035c: 6e20 0600 2400                         |0092: invoke-virtual {v4, v2}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+000362: 0c04                                   |0095: move-result-object v4
+000364: 6e10 0800 0400                         |0096: invoke-virtual {v4}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+00036a: 0c04                                   |0099: move-result-object v4
+00036c: 6e20 0200 4300                         |009a: invoke-virtual {v3, v4}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+000372: 6203 0000                              |009d: sget-object v3, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+000376: 2204 0700                              |009f: new-instance v4, Ljava/lang/StringBuilder; // type@0007
+00037a: 7010 0500 0400                         |00a1: invoke-direct {v4}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+000380: 1a05 2100                              |00a4: const-string v5, "f = " // string@0021
+000384: 6e20 0700 5400                         |00a6: invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+00038a: 0c04                                   |00a9: move-result-object v4
+00038c: 6e20 0600 6400                         |00aa: invoke-virtual {v4, v6}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+000392: 0c04                                   |00ad: move-result-object v4
+000394: 6e10 0800 0400                         |00ae: invoke-virtual {v4}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+00039a: 0c04                                   |00b1: move-result-object v4
+00039c: 6e20 0200 4300                         |00b2: invoke-virtual {v3, v4}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+0003a2: 6203 0000                              |00b5: sget-object v3, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+0003a6: 1a04 0500                              |00b7: const-string v4, "--------------------" // string@0005
+0003aa: 6e20 0200 4300                         |00b9: invoke-virtual {v3, v4}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+0003b0: 9003 0001                              |00bc: add-int v3, v0, v1
+0003b4: b032                                   |00be: add-int/2addr v2, v3
+0003b6: 6204 0000                              |00bf: sget-object v4, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+0003ba: 2205 0700                              |00c1: new-instance v5, Ljava/lang/StringBuilder; // type@0007
+0003be: 7010 0500 0500                         |00c3: invoke-direct {v5}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+0003c4: 1a06 1c00                              |00c6: const-string v6, "c = x + y = " // string@001c
+0003c8: 6e20 0700 6500                         |00c8: invoke-virtual {v5, v6}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+0003ce: 0c05                                   |00cb: move-result-object v5
+0003d0: 6e20 0600 0500                         |00cc: invoke-virtual {v5, v0}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+0003d6: 0c00                                   |00cf: move-result-object v0
+0003d8: 1a05 0100                              |00d0: const-string v5, " + " // string@0001
+0003dc: 6e20 0700 5000                         |00d2: invoke-virtual {v0, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+0003e2: 0c00                                   |00d5: move-result-object v0
+0003e4: 6e20 0600 1000                         |00d6: invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+0003ea: 0c00                                   |00d9: move-result-object v0
+0003ec: 1a05 0400                              |00da: const-string v5, " = " // string@0004
+0003f0: 6e20 0700 5000                         |00dc: invoke-virtual {v0, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+0003f6: 0c00                                   |00df: move-result-object v0
+0003f8: 6e20 0600 3000                         |00e0: invoke-virtual {v0, v3}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+0003fe: 0c00                                   |00e3: move-result-object v0
+000400: 6e10 0800 0000                         |00e4: invoke-virtual {v0}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+000406: 0c00                                   |00e7: move-result-object v0
+000408: 6e20 0200 0400                         |00e8: invoke-virtual {v4, v0}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+00040e: 6200 0000                              |00eb: sget-object v0, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+000412: 2204 0700                              |00ed: new-instance v4, Ljava/lang/StringBuilder; // type@0007
+000416: 7010 0500 0400                         |00ef: invoke-direct {v4}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+00041c: 1a05 2000                              |00f2: const-string v5, "d = d + c = " // string@0020
+000420: 6e20 0700 5400                         |00f4: invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+000426: 0c04                                   |00f7: move-result-object v4
+000428: 6e20 0600 2400                         |00f8: invoke-virtual {v4, v2}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+00042e: 0c04                                   |00fb: move-result-object v4
+000430: 6e10 0800 0400                         |00fc: invoke-virtual {v4}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+000436: 0c04                                   |00ff: move-result-object v4
+000438: 6e20 0200 4000                         |0100: invoke-virtual {v0, v4}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+00043e: db00 0302                              |0103: div-int/lit8 v0, v3, #int 2 // #02
+000442: 6203 0000                              |0105: sget-object v3, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+000446: 2204 0700                              |0107: new-instance v4, Ljava/lang/StringBuilder; // type@0007
+00044a: 7010 0500 0400                         |0109: invoke-direct {v4}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+000450: 1a05 2a00                              |010c: const-string v5, "x = c/2 = " // string@002a
+000454: 6e20 0700 5400                         |010e: invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+00045a: 0c04                                   |0111: move-result-object v4
+00045c: 6e20 0600 0400                         |0112: invoke-virtual {v4, v0}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+000462: 0c04                                   |0115: move-result-object v4
+000464: 6e10 0800 0400                         |0116: invoke-virtual {v4}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+00046a: 0c04                                   |0119: move-result-object v4
+00046c: 6e20 0200 4300                         |011a: invoke-virtual {v3, v4}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+000472: 9203 0001                              |011d: mul-int v3, v0, v1
+000476: b032                                   |011f: add-int/2addr v2, v3
+000478: 6204 0000                              |0120: sget-object v4, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+00047c: 2205 0700                              |0122: new-instance v5, Ljava/lang/StringBuilder; // type@0007
+000480: 7010 0500 0500                         |0124: invoke-direct {v5}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+000486: 1a06 1b00                              |0127: const-string v6, "c = x * y = " // string@001b
+00048a: 6e20 0700 6500                         |0129: invoke-virtual {v5, v6}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+000490: 0c05                                   |012c: move-result-object v5
+000492: 6e20 0600 0500                         |012d: invoke-virtual {v5, v0}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+000498: 0c00                                   |0130: move-result-object v0
+00049a: 1a05 0000                              |0131: const-string v5, " * " // string@0000
+00049e: 6e20 0700 5000                         |0133: invoke-virtual {v0, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+0004a4: 0c00                                   |0136: move-result-object v0
+0004a6: 6e20 0600 1000                         |0137: invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+0004ac: 0c00                                   |013a: move-result-object v0
+0004ae: 1a05 0400                              |013b: const-string v5, " = " // string@0004
+0004b2: 6e20 0700 5000                         |013d: invoke-virtual {v0, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+0004b8: 0c00                                   |0140: move-result-object v0
+0004ba: 6e20 0600 3000                         |0141: invoke-virtual {v0, v3}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+0004c0: 0c00                                   |0144: move-result-object v0
+0004c2: 6e10 0800 0000                         |0145: invoke-virtual {v0}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+0004c8: 0c00                                   |0148: move-result-object v0
+0004ca: 6e20 0200 0400                         |0149: invoke-virtual {v4, v0}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+0004d0: 6200 0000                              |014c: sget-object v0, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+0004d4: 2204 0700                              |014e: new-instance v4, Ljava/lang/StringBuilder; // type@0007
+0004d8: 7010 0500 0400                         |0150: invoke-direct {v4}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+0004de: 1a05 2000                              |0153: const-string v5, "d = d + c = " // string@0020
+0004e2: 6e20 0700 5400                         |0155: invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+0004e8: 0c04                                   |0158: move-result-object v4
+0004ea: 6e20 0600 2400                         |0159: invoke-virtual {v4, v2}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+0004f0: 0c04                                   |015c: move-result-object v4
+0004f2: 6e10 0800 0400                         |015d: invoke-virtual {v4}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+0004f8: 0c04                                   |0160: move-result-object v4
+0004fa: 6e20 0200 4000                         |0161: invoke-virtual {v0, v4}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+000500: db00 0302                              |0164: div-int/lit8 v0, v3, #int 2 // #02
+000504: 6203 0000                              |0166: sget-object v3, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+000508: 2204 0700                              |0168: new-instance v4, Ljava/lang/StringBuilder; // type@0007
+00050c: 7010 0500 0400                         |016a: invoke-direct {v4}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+000512: 1a05 2a00                              |016d: const-string v5, "x = c/2 = " // string@002a
+000516: 6e20 0700 5400                         |016f: invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+00051c: 0c04                                   |0172: move-result-object v4
+00051e: 6e20 0600 0400                         |0173: invoke-virtual {v4, v0}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+000524: 0c04                                   |0176: move-result-object v4
+000526: 6e10 0800 0400                         |0177: invoke-virtual {v4}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+00052c: 0c04                                   |017a: move-result-object v4
+00052e: 6e20 0200 4300                         |017b: invoke-virtual {v3, v4}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+000534: 9103 0001                              |017e: sub-int v3, v0, v1
+000538: b032                                   |0180: add-int/2addr v2, v3
+00053a: 6204 0000                              |0181: sget-object v4, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+00053e: 2205 0700                              |0183: new-instance v5, Ljava/lang/StringBuilder; // type@0007
+000542: 7010 0500 0500                         |0185: invoke-direct {v5}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+000548: 1a06 1d00                              |0188: const-string v6, "c = x - y = " // string@001d
+00054c: 6e20 0700 6500                         |018a: invoke-virtual {v5, v6}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+000552: 0c05                                   |018d: move-result-object v5
+000554: 6e20 0600 0500                         |018e: invoke-virtual {v5, v0}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+00055a: 0c00                                   |0191: move-result-object v0
+00055c: 1a05 0200                              |0192: const-string v5, " - " // string@0002
+000560: 6e20 0700 5000                         |0194: invoke-virtual {v0, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+000566: 0c00                                   |0197: move-result-object v0
+000568: 6e20 0600 1000                         |0198: invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+00056e: 0c00                                   |019b: move-result-object v0
+000570: 1a05 0400                              |019c: const-string v5, " = " // string@0004
+000574: 6e20 0700 5000                         |019e: invoke-virtual {v0, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+00057a: 0c00                                   |01a1: move-result-object v0
+00057c: 6e20 0600 3000                         |01a2: invoke-virtual {v0, v3}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+000582: 0c00                                   |01a5: move-result-object v0
+000584: 6e10 0800 0000                         |01a6: invoke-virtual {v0}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+00058a: 0c00                                   |01a9: move-result-object v0
+00058c: 6e20 0200 0400                         |01aa: invoke-virtual {v4, v0}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+000592: 6200 0000                              |01ad: sget-object v0, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+000596: 2204 0700                              |01af: new-instance v4, Ljava/lang/StringBuilder; // type@0007
+00059a: 7010 0500 0400                         |01b1: invoke-direct {v4}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+0005a0: 1a05 2000                              |01b4: const-string v5, "d = d + c = " // string@0020
+0005a4: 6e20 0700 5400                         |01b6: invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+0005aa: 0c04                                   |01b9: move-result-object v4
+0005ac: 6e20 0600 2400                         |01ba: invoke-virtual {v4, v2}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+0005b2: 0c04                                   |01bd: move-result-object v4
+0005b4: 6e10 0800 0400                         |01be: invoke-virtual {v4}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+0005ba: 0c04                                   |01c1: move-result-object v4
+0005bc: 6e20 0200 4000                         |01c2: invoke-virtual {v0, v4}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+0005c2: db00 0302                              |01c5: div-int/lit8 v0, v3, #int 2 // #02
+0005c6: 6203 0000                              |01c7: sget-object v3, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+0005ca: 2204 0700                              |01c9: new-instance v4, Ljava/lang/StringBuilder; // type@0007
+0005ce: 7010 0500 0400                         |01cb: invoke-direct {v4}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+0005d4: 1a05 2a00                              |01ce: const-string v5, "x = c/2 = " // string@002a
+0005d8: 6e20 0700 5400                         |01d0: invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+0005de: 0c04                                   |01d3: move-result-object v4
+0005e0: 6e20 0600 0400                         |01d4: invoke-virtual {v4, v0}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+0005e6: 0c04                                   |01d7: move-result-object v4
+0005e8: 6e10 0800 0400                         |01d8: invoke-virtual {v4}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+0005ee: 0c04                                   |01db: move-result-object v4
+0005f0: 6e20 0200 4300                         |01dc: invoke-virtual {v3, v4}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+0005f6: 9303 0001                              |01df: div-int v3, v0, v1
+0005fa: b032                                   |01e1: add-int/2addr v2, v3
+0005fc: 6204 0000                              |01e2: sget-object v4, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+000600: 2205 0700                              |01e4: new-instance v5, Ljava/lang/StringBuilder; // type@0007
+000604: 7010 0500 0500                         |01e6: invoke-direct {v5}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+00060a: 1a06 1e00                              |01e9: const-string v6, "c = x / y = " // string@001e
+00060e: 6e20 0700 6500                         |01eb: invoke-virtual {v5, v6}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+000614: 0c05                                   |01ee: move-result-object v5
+000616: 6e20 0600 0500                         |01ef: invoke-virtual {v5, v0}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+00061c: 0c05                                   |01f2: move-result-object v5
+00061e: 1a06 0300                              |01f3: const-string v6, " / " // string@0003
+000622: 6e20 0700 6500                         |01f5: invoke-virtual {v5, v6}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+000628: 0c05                                   |01f8: move-result-object v5
+00062a: 6e20 0600 1500                         |01f9: invoke-virtual {v5, v1}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+000630: 0c05                                   |01fc: move-result-object v5
+000632: 1a06 0400                              |01fd: const-string v6, " = " // string@0004
+000636: 6e20 0700 6500                         |01ff: invoke-virtual {v5, v6}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+00063c: 0c05                                   |0202: move-result-object v5
+00063e: 6e20 0600 3500                         |0203: invoke-virtual {v5, v3}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+000644: 0c05                                   |0206: move-result-object v5
+000646: 6e10 0800 0500                         |0207: invoke-virtual {v5}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+00064c: 0c05                                   |020a: move-result-object v5
+00064e: 6e20 0200 5400                         |020b: invoke-virtual {v4, v5}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+000654: 6204 0000                              |020e: sget-object v4, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+000658: 2205 0700                              |0210: new-instance v5, Ljava/lang/StringBuilder; // type@0007
+00065c: 7010 0500 0500                         |0212: invoke-direct {v5}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+000662: 1a06 2000                              |0215: const-string v6, "d = d + c = " // string@0020
+000666: 6e20 0700 6500                         |0217: invoke-virtual {v5, v6}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+00066c: 0c05                                   |021a: move-result-object v5
+00066e: 6e20 0600 2500                         |021b: invoke-virtual {v5, v2}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+000674: 0c05                                   |021e: move-result-object v5
+000676: 6e10 0800 0500                         |021f: invoke-virtual {v5}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+00067c: 0c05                                   |0222: move-result-object v5
+00067e: 6e20 0200 5400                         |0223: invoke-virtual {v4, v5}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+000684: 9004 0200                              |0226: add-int v4, v2, v0
+000688: b014                                   |0228: add-int/2addr v4, v1
+00068a: b034                                   |0229: add-int/2addr v4, v3
+00068c: 6205 0000                              |022a: sget-object v5, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+000690: 2206 0700                              |022c: new-instance v6, Ljava/lang/StringBuilder; // type@0007
+000694: 7010 0500 0600                         |022e: invoke-direct {v6}, Ljava/lang/StringBuilder;.<init>:()V // method@0005
+00069a: 1a07 2100                              |0231: const-string v7, "f = " // string@0021
+00069e: 6e20 0700 7600                         |0233: invoke-virtual {v6, v7}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+0006a4: 0c06                                   |0236: move-result-object v6
+0006a6: 6e20 0600 2600                         |0237: invoke-virtual {v6, v2}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+0006ac: 0c02                                   |023a: move-result-object v2
+0006ae: 1a06 0100                              |023b: const-string v6, " + " // string@0001
+0006b2: 6e20 0700 6200                         |023d: invoke-virtual {v2, v6}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+0006b8: 0c02                                   |0240: move-result-object v2
+0006ba: 6e20 0600 0200                         |0241: invoke-virtual {v2, v0}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+0006c0: 0c00                                   |0244: move-result-object v0
+0006c2: 1a02 0100                              |0245: const-string v2, " + " // string@0001
+0006c6: 6e20 0700 2000                         |0247: invoke-virtual {v0, v2}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+0006cc: 0c00                                   |024a: move-result-object v0
+0006ce: 6e20 0600 1000                         |024b: invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+0006d4: 0c00                                   |024e: move-result-object v0
+0006d6: 1a01 0100                              |024f: const-string v1, " + " // string@0001
+0006da: 6e20 0700 1000                         |0251: invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+0006e0: 0c00                                   |0254: move-result-object v0
+0006e2: 6e20 0600 3000                         |0255: invoke-virtual {v0, v3}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+0006e8: 0c00                                   |0258: move-result-object v0
+0006ea: 1a01 0400                              |0259: const-string v1, " = " // string@0004
+0006ee: 6e20 0700 1000                         |025b: invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@0007
+0006f4: 0c00                                   |025e: move-result-object v0
+0006f6: 6e20 0600 4000                         |025f: invoke-virtual {v0, v4}, Ljava/lang/StringBuilder;.append:(I)Ljava/lang/StringBuilder; // method@0006
+0006fc: 0c00                                   |0262: move-result-object v0
+0006fe: 6e10 0800 0000                         |0263: invoke-virtual {v0}, Ljava/lang/StringBuilder;.toString:()Ljava/lang/String; // method@0008
+000704: 0c00                                   |0266: move-result-object v0
+000706: 6e20 0200 0500                         |0267: invoke-virtual {v5, v0}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+00070c: 6200 0000                              |026a: sget-object v0, Ljava/lang/System;.out:Ljava/io/PrintStream; // field@0000
+000710: 1a01 0800                              |026c: const-string v1, "Foo Test By WJY" // string@0008
+000714: 6e20 0200 1000                         |026e: invoke-virtual {v0, v1}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
+00071a: 0e00                                   |0271: return-void
+      catches       : (none)
+      positions     : 
+        0x0001 line=4
+        0x000c line=5
+        0x000e line=7
+        0x0010 line=9
+        0x0017 line=10
+        0x001e line=11
+        0x0025 line=12
+        0x003d line=13
+        0x0055 line=14
+        0x006d line=15
+        0x0085 line=16
+        0x009d line=17
+        0x00b5 line=18
+        0x00bc line=20
+        0x00be line=21
+        0x00bf line=22
+        0x00eb line=23
+        0x0103 line=24
+        0x0105 line=25
+        0x011d line=27
+        0x011f line=28
+        0x0120 line=29
+        0x014c line=30
+        0x0164 line=31
+        0x0166 line=32
+        0x017e line=34
+        0x0180 line=35
+        0x0181 line=36
+        0x01ad line=37
+        0x01c5 line=38
+        0x01c7 line=39
+        0x01df line=41
+        0x01e1 line=42
+        0x01e2 line=43
+        0x020e line=44
+        0x0226 line=46
+        0x022a line=47
+        0x026a line=48
+        0x0271 line=50
+      locals        : 
+
+  Virtual methods   -
+  source_file_idx   : 9 (Foo1.java)
+
