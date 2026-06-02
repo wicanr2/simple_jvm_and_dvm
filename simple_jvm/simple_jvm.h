@@ -277,8 +277,11 @@ typedef struct _SimpleMethodPool {
     int method_used;
 }SimpleMethodPool ;
 //-----------------------------------
-// constant pool parser 
-int parseConstantPool(FILE *fp, int count);
+/* 前向宣告; 完整定義在 LocalVariables 之後 (需先有各 pool / StackFrame 型別) */
+typedef struct _JvmContext JvmContext;
+//-----------------------------------
+// constant pool parser
+int parseConstantPool(JvmContext *ctx, FILE *fp, int count);
 void printConstantPool( SimpleConstantPool *p );
 ConstantUTF8 *findUTF8( SimpleConstantPool *p , int index );
 ConstantStringRef *findStringRef( SimpleConstantPool *p , int index );
@@ -294,17 +297,17 @@ double get_double_from_constant_pool( SimpleConstantPool *p, int index );
 /*
  *  Interface Pool Parser
  */
-int parseInterfacePool(FILE *fp, int count);
+int parseInterfacePool(JvmContext *ctx, FILE *fp, int count);
 void printInterfacePool( SimpleConstantPool *p, SimpleInterfacePool *ip);
 /*
  *  Field Pool Parser
  */
-int parseFieldPool(FILE *fp, int count);
+int parseFieldPool(JvmContext *ctx, FILE *fp, int count);
 void printFieldPool( SimpleConstantPool *p, SimpleFieldPool *fp);
 /*
  *  Method Pool Parser
  */
-int parseMethodPool(FILE *fp, int count);
+int parseMethodPool(JvmContext *ctx, FILE *fp, int count);
 void printMethodPool( SimpleConstantPool *p, SimpleMethodPool *fp);
 MethodInfo *findMethodInPool(
         SimpleConstantPool *p,
@@ -319,13 +322,13 @@ void printCodeAttribute( CodeAttribute *ca, SimpleConstantPool *p );
 /*
  * Java Class File Parser
  */
-int parseJavaClassFile( char *file, ClassFileFormat *cff );
+int parseJavaClassFile( JvmContext *ctx, char *file, ClassFileFormat *cff );
 void printClassFileFormat(ClassFileFormat *cff);
 char* getMajorVersionString(u2 major_number);
 /*
  * Free Pools 
  */
-void free_pools();
+void free_pools(JvmContext *ctx);
 //-----------------------------------
 /*
  * Stack Frame
@@ -369,8 +372,24 @@ typedef struct _LocalVariables{
     int integer[10];
 }LocalVariables;
 //-----------------------------------
+/*
+ * JVM 執行情境: 把原本散落的 6 個全域 pool 收進單一 context, 由 main 擁有並
+ * 顯式傳遞 (對齊 DVM 的 DexFileFormat / simple_dalvik_vm 指標風格), 移除全域可變狀態。
+ *
+ * 過渡說明: op 函式仍同時收到 stack/p 參數 (= &ctx->stack / &ctx->constant_pool)
+ * 作為便利存取, 與 ctx 內欄位重複; 之後可逐步收斂掉。
+ */
+typedef struct _JvmContext {
+    SimpleConstantPool  constant_pool;
+    SimpleInterfacePool interface_pool;
+    SimpleFieldPool     field_pool;
+    SimpleMethodPool    method_pool;
+    StackFrame          stack;
+    LocalVariables      locals;
+} JvmContext;
+//-----------------------------------
 // byte Codes
-typedef int (*opCodeFunc) (unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p );
+typedef int (*opCodeFunc) (unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p, JvmContext *ctx );
 
 
 typedef struct _byteCode {
@@ -379,7 +398,7 @@ typedef struct _byteCode {
     int offset;
     opCodeFunc func; 
 } byteCode;
-int executeMethod( MethodInfo *startup, StackFrame *stack, SimpleConstantPool *p );
+int executeMethod( JvmContext *ctx, MethodInfo *startup );
 char *findOpCode( unsigned char op );
 opCodeFunc findOpCodeFunc( unsigned char op ) ;
 int findOpCodeOffset( unsigned char op );

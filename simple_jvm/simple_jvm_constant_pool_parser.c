@@ -3,16 +3,15 @@
 #include <string.h>
 #include "simple_jvm.h"
 
-extern SimpleConstantPool simpleConstantPool;
 const int tag_additional_byte_size[13] = { 
     0, 2, 0, 4, 4, 
     8, 8, 2, 2, 4,
     4, 4, 4
 };
 // parse UTF-8 String
-int parseCPString( FILE *fp, int index ) {
+int parseCPString( JvmContext *ctx, FILE *fp, int index ) {
     unsigned char short_tmp[2];
-    ConstantUTF8 *ptr = &simpleConstantPool.utf8CP[ simpleConstantPool.utf8_used ];
+    ConstantUTF8 *ptr = &ctx->constant_pool.utf8CP[ ctx->constant_pool.utf8_used ];
 
     ptr->tag = CONSTANT_UTF8;
     ptr->index = index;
@@ -28,14 +27,14 @@ int parseCPString( FILE *fp, int index ) {
     fread( ptr->ptr , ptr->string_size , 1, fp );
     ptr->ptr[ptr->string_size]='\0';
     //printf("constant = %s\n", ptr->ptr);
-    simpleConstantPool.utf8_used++;
+    ctx->constant_pool.utf8_used++;
     return 0;
 }
 
 // parse Integer
-int parseCPInteger( FILE *fp, int index ) {
+int parseCPInteger( JvmContext *ctx, FILE *fp, int index ) {
     unsigned char tmp[4];
-    ConstantInteger *ptr = &simpleConstantPool.integerCP[ simpleConstantPool.integer_used];
+    ConstantInteger *ptr = &ctx->constant_pool.integerCP[ ctx->constant_pool.integer_used];
 
     ptr->tag = CONSTANT_INTEGER  ;
     ptr->index = index;
@@ -44,16 +43,16 @@ int parseCPInteger( FILE *fp, int index ) {
     fread( tmp, 4, 1, fp );
     ptr->value = (tmp[0] << 24 | tmp[1] << 16 | tmp[2] << 8 | tmp[3]);
     
-    simpleConstantPool.integer_used++;
+    ctx->constant_pool.integer_used++;
     return 0;
 }
 
 /*
  parse Float 
  */
-int parseCPFloat( FILE *fp, int index ) {
+int parseCPFloat( JvmContext *ctx, FILE *fp, int index ) {
     unsigned char tmp[4];
-    ConstantFloat *ptr = &simpleConstantPool.floatCP[ simpleConstantPool.float_used];
+    ConstantFloat *ptr = &ctx->constant_pool.floatCP[ ctx->constant_pool.float_used];
 
     ptr->tag = CONSTANT_FLOAT  ;
     ptr->index = index;
@@ -62,16 +61,16 @@ int parseCPFloat( FILE *fp, int index ) {
     fread( tmp, 4, 1, fp );
     ptr->value = (tmp[0] << 24 | tmp[1] << 16 | tmp[2] << 8 | tmp[3]);
     
-    simpleConstantPool.float_used++;
+    ctx->constant_pool.float_used++;
     return 0;
 }
 
 /*
  parse LONG 
  */
-int parseCPLong( FILE *fp, int index ) {
+int parseCPLong( JvmContext *ctx, FILE *fp, int index ) {
     unsigned char tmp[8];
-    ConstantLong *ptr = &simpleConstantPool.longCP[ simpleConstantPool.long_used];
+    ConstantLong *ptr = &ctx->constant_pool.longCP[ ctx->constant_pool.long_used];
 
     ptr->tag = CONSTANT_LONG  ;
     ptr->index = index;
@@ -80,18 +79,18 @@ int parseCPLong( FILE *fp, int index ) {
     fread( tmp, 8, 1, fp );
     memcpy( &ptr->value, tmp, 8);
     
-    simpleConstantPool.long_used++;
+    ctx->constant_pool.long_used++;
     return 0;
 }
 
 /*
  parse Double 
  */
-int parseCPDouble( FILE *fp, int index ) {
+int parseCPDouble( JvmContext *ctx, FILE *fp, int index ) {
     unsigned char tmp[8];
     unsigned char tmp2[8];
     int i = 0, j = 0;
-    ConstantDouble *ptr = &simpleConstantPool.doubleCP[ simpleConstantPool.double_used];
+    ConstantDouble *ptr = &ctx->constant_pool.doubleCP[ ctx->constant_pool.double_used];
 
     ptr->tag = CONSTANT_DOUBLE  ;
     ptr->index = index;
@@ -104,13 +103,13 @@ int parseCPDouble( FILE *fp, int index ) {
     memcpy( &ptr->value, tmp2, 8 );
     //printf("ptr->value = %lf\n", ptr->value);
     
-    simpleConstantPool.double_used++;
+    ctx->constant_pool.double_used++;
     return 0;
 }
 // parse Constant Pool Class 
-int parseCPClass( FILE *fp, int index ) {
+int parseCPClass( JvmContext *ctx, FILE *fp, int index ) {
     unsigned char short_tmp[2];
-    ConstantClassRef *ptr = &simpleConstantPool.clasz[ simpleConstantPool.clasz_used ];
+    ConstantClassRef *ptr = &ctx->constant_pool.clasz[ ctx->constant_pool.clasz_used ];
 
     ptr->tag = CONSTANT_CLASS;
     ptr->index = index;
@@ -120,14 +119,14 @@ int parseCPClass( FILE *fp, int index ) {
     fread( short_tmp, 2, 1, fp );
     ptr->stringIndex = short_tmp[0] << 8 | short_tmp[1];
 
-    simpleConstantPool.clasz_used++;
+    ctx->constant_pool.clasz_used++;
     return 0;
 }
 
 // parse Constant Pool String Ref 
-int parseCPStringRef( FILE *fp, int index ) {
+int parseCPStringRef( JvmContext *ctx, FILE *fp, int index ) {
     unsigned char short_tmp[2];
-    ConstantStringRef *ptr = &simpleConstantPool.stringRef[ simpleConstantPool.stringRef_used ];
+    ConstantStringRef *ptr = &ctx->constant_pool.stringRef[ ctx->constant_pool.stringRef_used ];
 
     ptr->tag = CONSTANT_STRING_REF;
     ptr->index = index;
@@ -137,14 +136,14 @@ int parseCPStringRef( FILE *fp, int index ) {
     fread( short_tmp, 2, 1, fp );
     ptr->stringIndex = short_tmp[0] << 8 | short_tmp[1];
 
-    simpleConstantPool.stringRef_used++;
+    ctx->constant_pool.stringRef_used++;
     return 0;
 }
 
 // parse Constant Pool Field
-int parseCPField( FILE *fp, int index ) {
+int parseCPField( JvmContext *ctx, FILE *fp, int index ) {
     unsigned char short_tmp[2];
-    ConstantFieldRef *ptr = &simpleConstantPool.field[ simpleConstantPool.field_used ];
+    ConstantFieldRef *ptr = &ctx->constant_pool.field[ ctx->constant_pool.field_used ];
 
     ptr->tag = CONSTANT_FIELD_REF;
     ptr->index = index;
@@ -157,16 +156,16 @@ int parseCPField( FILE *fp, int index ) {
     fread( short_tmp, 2, 1, fp );
     ptr->nameAndTypeIndex = short_tmp[0] << 8 | short_tmp[1];
 
-    simpleConstantPool.field_used++;
+    ctx->constant_pool.field_used++;
     return 0;
 }
 
 
 
 // parse Constant Pool Method
-int parseCPMethod( FILE *fp, int index ) {
+int parseCPMethod( JvmContext *ctx, FILE *fp, int index ) {
     unsigned char short_tmp[2];
-    ConstantMethodRef *ptr = &simpleConstantPool.method[ simpleConstantPool.method_used ];
+    ConstantMethodRef *ptr = &ctx->constant_pool.method[ ctx->constant_pool.method_used ];
 
     ptr->tag = CONSTANT_METHOD_REF;
     ptr->index = index;
@@ -179,14 +178,14 @@ int parseCPMethod( FILE *fp, int index ) {
     fread( short_tmp, 2, 1, fp );
     ptr->nameAndTypeIndex = short_tmp[0] << 8 | short_tmp[1];
 
-    simpleConstantPool.method_used++;
+    ctx->constant_pool.method_used++;
     return 0;
 }
 
 // parse Constant Pool Interface 
-int parseCPInterface( FILE *fp, int index ) {
+int parseCPInterface( JvmContext *ctx, FILE *fp, int index ) {
     unsigned char short_tmp[2];
-    ConstantInterfaceRef *ptr = &simpleConstantPool.interface[ simpleConstantPool.interface_used ];
+    ConstantInterfaceRef *ptr = &ctx->constant_pool.interface[ ctx->constant_pool.interface_used ];
 
     ptr->tag = CONSTANT_INTERFACE_REF  ;
     ptr->index = index;
@@ -199,14 +198,14 @@ int parseCPInterface( FILE *fp, int index ) {
     fread( short_tmp, 2, 1, fp );
     ptr->nameAndTypeIndex = short_tmp[0] << 8 | short_tmp[1];
 
-    simpleConstantPool.interface_used++;
+    ctx->constant_pool.interface_used++;
     return 0;
 }
 
 // parse Constant Pool Interface 
-int parseCPNameAndType( FILE *fp, int index ) {
+int parseCPNameAndType( JvmContext *ctx, FILE *fp, int index ) {
     unsigned char short_tmp[2];
-    ConstantNameAndType *ptr = &simpleConstantPool.name_and_type[ simpleConstantPool.name_and_type_used];
+    ConstantNameAndType *ptr = &ctx->constant_pool.name_and_type[ ctx->constant_pool.name_and_type_used];
 
     ptr->tag = CONSTANT_NAME_AND_TYPE  ;
     ptr->index = index;
@@ -219,11 +218,11 @@ int parseCPNameAndType( FILE *fp, int index ) {
     fread( short_tmp, 2, 1, fp );
     ptr->typeIndex = short_tmp[0] << 8 | short_tmp[1];
 
-    simpleConstantPool.name_and_type_used++;
+    ctx->constant_pool.name_and_type_used++;
     return 0;
 }
 
-int parseConstantPool(FILE *fp, int count) {
+int parseConstantPool(JvmContext *ctx, FILE *fp, int count) {
     unsigned char tag = 0;
     int i = 0 ;
     //printf("count = %d\n",count);
@@ -233,50 +232,50 @@ int parseConstantPool(FILE *fp, int count) {
         switch ( tag ) {
             case CONSTANT_UTF8  : 
                 //printf("before UTF8 file offset = %04x\n", ftell  ( fp ) );
-                parseCPString(fp,i);
+                parseCPString(ctx, fp,i);
             break;
             case CONSTANT_INTEGER  : 
                 //printf("before CONSTANT_INTEGER file offset = %04x\n", ftell  ( fp ) );
-                parseCPInteger(fp,i);
+                parseCPInteger(ctx, fp,i);
             break;
             case CONSTANT_FLOAT  : 
                 //printf("before CONSTANT_FLOAT file offset = %04x\n", ftell  ( fp ) );
-                parseCPFloat(fp,i);
+                parseCPFloat(ctx, fp,i);
             break;
             case CONSTANT_LONG  : 
                 //printf("before CONSTANT_LONG file offset = %04x\n", ftell  ( fp ) );
-                parseCPLong(fp,i);
+                parseCPLong(ctx, fp,i);
                 i++;
             break;
             case CONSTANT_DOUBLE  : 
                 //printf("before CONSTANT_DOUBLE file offset = %04x\n", ftell  ( fp ) );
-                parseCPDouble(fp,i);
+                parseCPDouble(ctx, fp,i);
                 //printf("after CONSTANT_DOUBLE file offset = %04x\n", ftell  ( fp ) );
                 i++;
             break;
             case CONSTANT_STRING_REF  : 
                 //printf("before CONSTANT_STRING_REF file offset = %04x\n", ftell  ( fp ) );
-                parseCPStringRef(fp,i);
+                parseCPStringRef(ctx, fp,i);
             break;
             case CONSTANT_CLASS  : 
                 //printf("before CONSTANT_CLASS file offset = %04x\n", ftell  ( fp ) );
-                parseCPClass(fp,i);
+                parseCPClass(ctx, fp,i);
             break;
             case CONSTANT_FIELD_REF  : 
                 //printf("before CONSTANT_FIELD_REF file offset = %04x\n", ftell  ( fp ) );
-                parseCPField(fp,i);
+                parseCPField(ctx, fp,i);
             break;
             case CONSTANT_METHOD_REF  : 
                 //printf("before CONSTANT_METHOD_REF file offset = %04x\n", ftell  ( fp ) );
-                parseCPMethod(fp,i);
+                parseCPMethod(ctx, fp,i);
             break;
             case CONSTANT_INTERFACE_REF  : 
                 //printf("before CONSTANT_INTERFACE_REF file offset = %04x\n", ftell  ( fp ) );
-                parseCPInterface(fp,i);
+                parseCPInterface(ctx, fp,i);
             break;
             case CONSTANT_NAME_AND_TYPE  : 
                 //printf("before CONSTANT_NAME_AND_TYPE file offset = %04x\n", ftell  ( fp ) );
-                parseCPNameAndType(fp,i);
+                parseCPNameAndType(ctx, fp,i);
             break;
             default:
                 printf("\n!!!unknow tag = %02x!!!\n\n", tag);

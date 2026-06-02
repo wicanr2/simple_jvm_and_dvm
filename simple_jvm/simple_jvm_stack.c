@@ -3,10 +3,6 @@
 #include <string.h>
 #include "simple_jvm.h"
 
-extern SimpleInterfacePool simpleInterfacePool;
-extern SimpleFieldPool simpleFieldPool;
-extern SimpleConstantPool simpleConstantPool;
-extern SimpleMethodPool simpleMethodPool; 
 /*
  * Stack Initialization
  */

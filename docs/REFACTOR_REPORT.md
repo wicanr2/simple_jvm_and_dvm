@@ -92,9 +92,18 @@ release / debug build 皆 **0 warning** (原 85 個)。重點:
 - sign-compare / format / unused / pointer-sign 逐一修正,皆不改變輸出 (golden 驗證)。
 - `test/{a,b}.cpp`、`test/main.c` (與 VM 無關的 demo) 移到 `examples/c_cpp_linkage/`。
 
-### E-2 JVM 全域狀態 → context struct (尚未做)
-6 個 global (`simpleConstantPool` 等) 包成 context 顯式傳遞,向 DVM 風格靠攏。
-動到每個 JVM parser,風險中高;golden (release) 可護住。建議單獨一個 commit 小步進行。
+### E-2 JVM 全域狀態 → context struct (完成)
+原本散落的 6 個全域 pool (`simpleConstantPool`/`simpleMethodPool`/`stackFrame`/
+`localVariables` …) 收進單一 `JvmContext`,由 `main` 以 `static JvmContext jvm` 擁有、
+以指標顯式傳遞 (對齊 DVM 的 `DexFileFormat*`/`simple_dalvik_vm*` 風格),**移除所有全域
+可變狀態與 `extern` 宣告** (剩 0 個)。
+
+- `opCodeFunc` 簽章追加 `JvmContext *ctx`;35 個 op、各 parser、`executeMethod`、
+  `free_pools`、`parseJavaClassFile` 全部串接 ctx。
+- 過渡設計: op 仍同時收 `stack`/`p` 參數 (= `&ctx->stack` / `&ctx->constant_pool`),
+  與 ctx 欄位重複,之後可再收斂 — 換取本次 op body 幾乎零變動、好 review。
+- **驗證限制**: golden 涵蓋 Foo1 執行路徑 (含 debug build 28KB 輸出, 會跑到 invoke ops);
+  未被 Foo1 觸發的 op 由 compiler 型別檢查 + 別名設計保證 (body 不變) 把關。
 
 ## 其他可選後續
 

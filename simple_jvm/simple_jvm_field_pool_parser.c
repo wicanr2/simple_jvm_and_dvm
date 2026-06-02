@@ -3,9 +3,6 @@
 #include <string.h>
 #include "simple_jvm.h"
 
-extern SimpleInterfacePool simpleInterfacePool;
-extern SimpleFieldPool simpleFieldPool;
-extern SimpleConstantPool simpleConstantPool;
 
 int parseAttr( FieldInfo *ptr, FILE *fp ) {
     int i = 0; 
@@ -32,9 +29,9 @@ int parseAttr( FieldInfo *ptr, FILE *fp ) {
     return 0;
 } 
 // parse Field Pool 
-int parseFP( FILE *fp ) {
+int parseFP( JvmContext *ctx, FILE *fp ) {
     unsigned char short_tmp[2];
-    FieldInfo *ptr = &simpleFieldPool.field[ simpleFieldPool.field_used ];
+    FieldInfo *ptr = &ctx->field_pool.field[ ctx->field_pool.field_used ];
 
     // access flag
     fread( short_tmp, 2, 1, fp );
@@ -57,7 +54,7 @@ int parseFP( FILE *fp ) {
 
     // parse attributes
     parseAttr( ptr, fp );
-    simpleFieldPool.field_used++;
+    ctx->field_pool.field_used++;
     return 0;
 }
 
@@ -85,10 +82,10 @@ void printFieldPool( SimpleConstantPool *p, SimpleFieldPool *fp) {
             }
     }
 }
-int parseFieldPool(FILE *fp, int count) {
+int parseFieldPool(JvmContext *ctx, FILE *fp, int count) {
     int i = 0; 
     for ( i = 0 ; i < count ; i ++ ) {
-        parseFP(fp);
+        parseFP(ctx, fp);
     }
     return 0;
 }

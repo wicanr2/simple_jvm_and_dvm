@@ -3,10 +3,6 @@
 #include <string.h>
 #include "simple_jvm.h"
 
-extern SimpleInterfacePool simpleInterfacePool;
-extern SimpleFieldPool simpleFieldPool;
-extern SimpleMethodPool simpleMethodPool;
-extern SimpleConstantPool simpleConstantPool;
 
 int parseMethodAttr(MethodInfo *ptr, FILE *fp ) {
     int i = 0;
@@ -31,9 +27,9 @@ int parseMethodAttr(MethodInfo *ptr, FILE *fp ) {
     return 0;
 } 
 // parse Method Pool
-int parseMP( FILE *fp ) {
+int parseMP( JvmContext *ctx, FILE *fp ) {
     unsigned char short_tmp[2];
-    MethodInfo *ptr = &simpleMethodPool.method[ simpleMethodPool.method_used ];
+    MethodInfo *ptr = &ctx->method_pool.method[ ctx->method_pool.method_used ];
 
     // access flag
     fread( short_tmp, 2, 1, fp );
@@ -55,7 +51,7 @@ int parseMP( FILE *fp ) {
     memset( ptr->attributes, 0, sizeof ( AttributeInfo ) * ptr->attributes_count );
     // parse method attributes
     parseMethodAttr( ptr, fp );
-    simpleMethodPool.method_used++;
+    ctx->method_pool.method_used++;
     return 0;
 }
 /*
@@ -172,10 +168,10 @@ void printMethodPool( SimpleConstantPool *p, SimpleMethodPool *mp) {
             }
     }
 }
-int parseMethodPool(FILE *fp, int count) {
+int parseMethodPool(JvmContext *ctx, FILE *fp, int count) {
     int i = 0; 
     for ( i = 0 ; i < count ; i ++ ) {
-        parseMP(fp);
+        parseMP(ctx, fp);
     }
     return 0;
 }

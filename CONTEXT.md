@@ -12,6 +12,8 @@
 
 ## JVM 側 (`simple_jvm/`)
 
+- **JvmContext** — JVM 全部執行狀態的容器 (6 個 pool + stack + locals);由 `main` 擁有、
+  以指標顯式傳遞,取代原本的全域 pool。 _Avoid_: global pool、`simpleConstantPool` 等舊全域名。
 - **ClassFileFormat** — 解析後的 `.class` 頂層結構 (magic / version / counts)。
 - **constant pool** — class 檔的常數表;本實作按 tag 分桶 (`SimpleConstantPool` 內 utf8CP / integerCP / method …)。 _Avoid_: CP (寫全名)。
 - **method pool / field pool / interface pool** — 對應 class 檔各區段的解析結果容器。
