@@ -78,9 +78,16 @@ int java_lang_string_builder_append( DexFileFormat *dex, simple_dalvik_vm *vm, c
     if ( type != 0 ){
         //printf("type = %s\n", type );
         if ( strcmp(type, "Ljava/lang/String;") == 0 ) {
-            buf_ptr += snprintf( buf + buf_ptr, 1024,"%s", get_string_data(dex, string_id)); 
+            buf_ptr += snprintf( buf + buf_ptr, 1024,"%s", get_string_data(dex, string_id));
         } else if ( strcmp(type,"I") == 0 ) {
-            buf_ptr += snprintf( buf + buf_ptr, 1024,"%d", string_id); 
+            buf_ptr += snprintf( buf + buf_ptr, 1024,"%d", string_id);
+        } else if ( strcmp(type,"D") == 0 ) {
+            // double 參數佔 reg pair (reg_idx[1] 低, reg_idx[2] 高), 沿用 add-double 慣例
+            double d = 0.0;
+            unsigned char *pp = (unsigned char*)&d;
+            load_reg_to_double(vm, p->reg_idx[1], pp+4);
+            load_reg_to_double(vm, p->reg_idx[2], pp);
+            buf_ptr += snprintf( buf + buf_ptr, 1024,"%g", d);
         }
     } 
     return 0;

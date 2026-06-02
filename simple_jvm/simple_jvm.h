@@ -369,7 +369,7 @@ int     is_ref_entry( StackFrame *stack );
 //-----------------------------------
 // local variable
 typedef struct _LocalVariables{
-    int integer[10];
+    int integer[16];   /* double 區域變數佔兩個 slot, 故擴容 */
 }LocalVariables;
 //-----------------------------------
 /*
@@ -378,8 +378,10 @@ typedef struct _LocalVariables{
  */
 #define JVM_MAX_ARRAYS 256
 typedef struct _JvmArray {
-    int *data;
-    int  length;
+    int    *data;      /* int 陣列 (newarray atype 10) */
+    double *ddata;     /* double 陣列 (newarray atype 7) */
+    int     length;
+    int     is_double;
 } JvmArray;
 //-----------------------------------
 /*

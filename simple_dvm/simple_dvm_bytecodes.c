@@ -692,17 +692,95 @@ int op_new_array( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
 {
     int vA = ptr[*pc+1] & 0x0F;
     int vB = (ptr[*pc+1] >> 4) & 0x0F;
+    int type_id = (ptr[*pc+3] << 8) | ptr[*pc+2];
     int count = 0;
     int handle = vm->array_count;
+    int n = 0;
+    char *tname = get_type_item_name(dex, type_id);   // "[I" / "[D"
+    int is_double = ( tname != 0 && tname[0] == '[' && tname[1] == 'D' );
     load_reg_to(vm, vB, (unsigned char*)&count);
+    n = count > 0 ? count : 1;
     if ( handle < DVM_MAX_ARRAYS ) {
         vm->array_count++;
         vm->arrays[handle].length = count;
-        vm->arrays[handle].data = (int*) calloc(count > 0 ? count : 1, sizeof(int));
+        vm->arrays[handle].is_double = is_double;
+        if ( is_double )
+            vm->arrays[handle].ddata = (double*) calloc(n, sizeof(double));
+        else
+            vm->arrays[handle].data = (int*) calloc(n, sizeof(int));
     }
     store_to_reg(vm, vA, (unsigned char*)&handle);
     if ( is_verbose() )
-        printf("new-array v%d, v%d (int[%d]) -> handle %d\n", vA, vB, count, handle);
+        printf("new-array v%d, v%d (%s[%d]) -> handle %d\n", vA, vB, is_double?"double":"int", count, handle);
+    *pc = *pc + 4;
+    return 0;
+}
+//------------------------------------------------------------------
+// double (wide) opcode (浮點 GEMM 所需); 沿用 add-double/2addr 的 reg pair 慣例
+//------------------------------------------------------------------
+// 0x18 const-wide vAA, #+lit64 : 載入 64-bit double 字面值到 reg pair  (51l, 10 bytes)
+int op_const_wide( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
+{
+    int vAA = ptr[*pc+1];
+    double d = 0.0;
+    unsigned char *p = (unsigned char*)&d;
+    memcpy(&d, &ptr[*pc+2], 8);               // little-endian IEEE754 bits
+    store_double_to_reg(vm, vAA,   p+4);
+    store_double_to_reg(vm, vAA+1, p);
+    if ( is_verbose() ) printf("const-wide v%d, %f\n", vAA, d);
+    *pc = *pc + 10;
+    return 0;
+}
+// 0x16 const-wide/16 vAA, #+int16 : 16-bit 號誌延伸成 64-bit (GEMM 只用於 0.0)  (21s, 4 bytes)
+int op_const_wide_16( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
+{
+    int vAA = ptr[*pc+1];
+    short s = (short)((ptr[*pc+3] << 8) | ptr[*pc+2]);
+    long long ll = (long long) s;             // 對 0 而言 long 0 == double 0.0 (bits 相同)
+    unsigned char *p = (unsigned char*)&ll;
+    store_double_to_reg(vm, vAA,   p+4);
+    store_double_to_reg(vm, vAA+1, p);
+    if ( is_verbose() ) printf("const-wide/16 v%d, %d\n", vAA, (int)s);
+    *pc = *pc + 4;
+    return 0;
+}
+// 0x45 aget-wide vAA, vBB, vCC : vAA,vAA+1 = darray(vBB)[vCC]  (23x)
+int op_aget_wide( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
+{
+    int vAA = ptr[*pc+1];
+    int vBB = ptr[*pc+2];
+    int vCC = ptr[*pc+3];
+    int handle = 0, index = 0;
+    double d = 0.0;
+    unsigned char *p = (unsigned char*)&d;
+    load_reg_to(vm, vBB, (unsigned char*)&handle);
+    load_reg_to(vm, vCC, (unsigned char*)&index);
+    if ( handle >= 0 && handle < vm->array_count && vm->arrays[handle].is_double &&
+         vm->arrays[handle].ddata && index >= 0 && index < vm->arrays[handle].length )
+        d = vm->arrays[handle].ddata[index];
+    store_double_to_reg(vm, vAA,   p+4);
+    store_double_to_reg(vm, vAA+1, p);
+    if ( is_verbose() ) printf("aget-wide v%d, v%d[v%d] = %f\n", vAA, vBB, vCC, d);
+    *pc = *pc + 4;
+    return 0;
+}
+// 0x4c aput-wide vAA, vBB, vCC : darray(vBB)[vCC] = vAA,vAA+1  (23x)
+int op_aput_wide( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
+{
+    int vAA = ptr[*pc+1];
+    int vBB = ptr[*pc+2];
+    int vCC = ptr[*pc+3];
+    int handle = 0, index = 0;
+    double d = 0.0;
+    unsigned char *p = (unsigned char*)&d;
+    load_reg_to_double(vm, vAA,   p+4);
+    load_reg_to_double(vm, vAA+1, p);
+    load_reg_to(vm, vBB, (unsigned char*)&handle);
+    load_reg_to(vm, vCC, (unsigned char*)&index);
+    if ( handle >= 0 && handle < vm->array_count && vm->arrays[handle].is_double &&
+         vm->arrays[handle].ddata && index >= 0 && index < vm->arrays[handle].length )
+        vm->arrays[handle].ddata[index] = d;
+    if ( is_verbose() ) printf("aput-wide v%d -> v%d[v%d] = %f\n", vAA, vBB, vCC, d);
     *pc = *pc + 4;
     return 0;
 }
@@ -905,7 +983,11 @@ byteCode byteCodes[] = {
     { "neg-int"           , 0x7b, 2,  op_neg_int },
     { "rem-int/2addr"     , 0xb4, 2,  op_rem_int_2addr },
     { "if-eqz"            , 0x38, 4,  op_if_eqz },
-    { "if-gt"             , 0x36, 4,  op_if_gt }
+    { "if-gt"             , 0x36, 4,  op_if_gt },
+    { "const-wide/16"     , 0x16, 4,  op_const_wide_16 },
+    { "const-wide"        , 0x18, 10, op_const_wide },
+    { "aget-wide"         , 0x45, 4,  op_aget_wide },
+    { "aput-wide"         , 0x4c, 4,  op_aput_wide }
 };
 static int byteCode_size = sizeof(byteCodes)/ sizeof(byteCode);
 

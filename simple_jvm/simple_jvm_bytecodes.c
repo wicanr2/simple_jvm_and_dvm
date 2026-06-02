@@ -426,8 +426,14 @@ int op_invokevirtual( JvmContext *ctx, unsigned char **opCode ) {
                 len = strlen(utf8);
                 memcpy( stringBuilderBuffer + stringBuilderUsed, utf8, len);
                 stringBuilderUsed += len;
-                JVM_LOG("%s\n", stringBuilderBuffer); 
-            } 
+                JVM_LOG("%s\n", stringBuilderBuffer);
+            } else if ( entry->type == STACK_ENTRY_DOUBLE ) {
+                double dv = EntryToDouble(entry);
+                sprintf(utf8,"%g",dv);
+                len = strlen(utf8);
+                memcpy( stringBuilderBuffer + stringBuilderUsed, utf8, len);
+                stringBuilderUsed += len;
+            }
 
         }
     }
@@ -488,16 +494,82 @@ int op_return( JvmContext *ctx, unsigned char **opCode ) {
 //==================================================================
 // 0xBC newarray atype : 只支援 int 陣列; 以 handle (arrays[] 索引) 當參考
 int op_newarray( JvmContext *ctx, unsigned char **opCode ) {
+    int atype = opCode[0][1];          // 7 = double, 10 = int
     int count = popInt(&ctx->stack);
     int handle = ctx->array_count;
+    int n = count > 0 ? count : 1;
     if ( handle < JVM_MAX_ARRAYS ) {
         ctx->array_count++;
         ctx->arrays[handle].length = count;
-        ctx->arrays[handle].data = (int*) calloc(count > 0 ? count : 1, sizeof(int));
+        if ( atype == 7 ) {            // double[]
+            ctx->arrays[handle].is_double = 1;
+            ctx->arrays[handle].ddata = (double*) calloc(n, sizeof(double));
+        } else {                       // int[]
+            ctx->arrays[handle].data = (int*) calloc(n, sizeof(int));
+        }
     }
     pushInt(&ctx->stack, handle);
-    JVM_LOG("newarray int[%d] -> handle %d\n", count, handle);
+    JVM_LOG("newarray atype=%d [%d] -> handle %d\n", atype, count, handle);
     *opCode = *opCode + 2;
+    return 0;
+}
+//------------------------------------------------------------------
+// double 陣列 / 區域變數 / 常數 opcode (浮點 GEMM 所需)
+//------------------------------------------------------------------
+// 0x0E dconst_0 : push 0.0
+int op_dconst_0( JvmContext *ctx, unsigned char **opCode ) {
+    pushDouble(&ctx->stack, 0.0);
+    JVM_LOG("dconst_0\n");
+    *opCode = *opCode + 1;
+    return 0;
+}
+// 0x18 dload idx / 0x39 dstore idx : double 區域變數 (佔兩個 slot, 以 8 bytes 存)
+int op_dload( JvmContext *ctx, unsigned char **opCode ) {
+    int index = opCode[0][1];
+    double v = 0.0;
+    memcpy(&v, &ctx->locals.integer[index], sizeof(double));
+    pushDouble(&ctx->stack, v);
+    JVM_LOG("dload local[%d] = %f\n", index, v);
+    *opCode = *opCode + 2;
+    return 0;
+}
+int op_dstore( JvmContext *ctx, unsigned char **opCode ) {
+    int index = opCode[0][1];
+    double v = popDouble(&ctx->stack);
+    memcpy(&ctx->locals.integer[index], &v, sizeof(double));
+    JVM_LOG("dstore local[%d] = %f\n", index, v);
+    *opCode = *opCode + 2;
+    return 0;
+}
+// 0x31 daload : ..., arrayref, index -> double value
+int op_daload( JvmContext *ctx, unsigned char **opCode ) {
+    int index  = popInt(&ctx->stack);
+    int handle = popInt(&ctx->stack);
+    double v = 0.0;
+    if ( handle >= 0 && handle < ctx->array_count &&
+         ctx->arrays[handle].is_double && ctx->arrays[handle].ddata &&
+         index >= 0 && index < ctx->arrays[handle].length ) {
+        v = ctx->arrays[handle].ddata[index];
+    }
+    pushDouble(&ctx->stack, v);
+    JVM_LOG("daload a[%d][%d] = %f\n", handle, index, v);
+    *opCode = *opCode + 1;
+    return 0;
+}
+// 0x52 dastore : ..., arrayref, index, double value ->
+int op_dastore( JvmContext *ctx, unsigned char **opCode ) {
+    // 值可能是 ldc2_w 推的常數池 REF (如 a[0]=1.1) 或 dload 來的真 double (如 c[..]=sum);
+    // get_double_parameter 會處理兩種情況。
+    double v  = get_double_parameter(&ctx->stack, &ctx->constant_pool);
+    int index = popInt(&ctx->stack);
+    int handle= popInt(&ctx->stack);
+    if ( handle >= 0 && handle < ctx->array_count &&
+         ctx->arrays[handle].is_double && ctx->arrays[handle].ddata &&
+         index >= 0 && index < ctx->arrays[handle].length ) {
+        ctx->arrays[handle].ddata[index] = v;
+    }
+    JVM_LOG("dastore a[%d][%d] = %f\n", handle, index, v);
+    *opCode = *opCode + 1;
     return 0;
 }
 // 0x19 aload idx / 0x2C aload_2 / 0x2D aload_3 : 載入區域變數的陣列參考 (handle)
@@ -722,7 +794,12 @@ byteCode byteCodes[] = {
     { "ineg"            , 0x74, 1,  op_ineg             },
     { "ifeq"            , 0x99, 3,  op_ifeq             },
     { "if_icmpgt"       , 0xA3, 3,  op_if_icmpgt        },
-    { "if_icmple"       , 0xA4, 3,  op_if_icmple        }
+    { "if_icmple"       , 0xA4, 3,  op_if_icmple        },
+    { "dconst_0"        , 0x0E, 1,  op_dconst_0         },
+    { "dload"           , 0x18, 2,  op_dload            },
+    { "dstore"          , 0x39, 2,  op_dstore           },
+    { "daload"          , 0x31, 1,  op_daload           },
+    { "dastore"         , 0x52, 1,  op_dastore          }
 };
 static int byteCode_size = sizeof(byteCodes)/ sizeof(byteCode);
 

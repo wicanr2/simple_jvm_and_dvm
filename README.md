@@ -148,6 +148,46 @@ build/simple_dvm GEMMDvm.dex     # Dalvik (register-based) 版
 > **分支怎麼做的**:opcode 收到目前指令的位置,bytecode 裡的 offset 是相對位移,把它加到
 > `pc` 就跳到目標。Dalvik 的 offset 以 **16-bit code unit** 計 (要 ×2 換成 byte),JVM 以 byte 計。
 
+### 浮點版 GEMM — 真正算小數 (double)
+
+`GEMMf.java` (JVM) / `GEMMfDvm.java` (DVM) 把矩陣換成 `double`,算真正的浮點數:
+
+```
+A = [[1.1,2.2],[3.3,4.4]]   B = [[0.5,1.5],[2.5,3.5]]   ⇒   C = [[6.05,9.35],[12.65,20.35]]
+```
+
+```bash
+build/simple_jvm GEMMf.class       # c[0]=6.05 c[1]=9.35 c[2]=12.65 c[3]=20.35
+build/simple_dvm GEMMfDvm.dex      # 同上
+```
+
+**這裡又看到 stack vs register 的差別,而且更明顯** — 因為 `double` 是 **64 位元**:
+
+| | JVM (堆疊機) | Dalvik (暫存器機) |
+|---|---|---|
+| 一個 double 佔 | operand stack 上 **2 個 slot** | **一對相鄰暫存器** (v, v+1) |
+| double 陣列讀寫 | `daload` / `dastore` | `aget-wide` / `aput-wide` |
+| double 區域變數 | `dload` / `dstore` (跨兩 slot) | (用暫存器對,本就成對) |
+| 載入 double 常數 | `dconst_0`、`ldc2_w` (從常數池) | `const-wide`、`const-wide/16` |
+| double 加 / 乘 | `dadd` / `dmul` | `add-double/2addr` / `mul-double/2addr` |
+
+> **實作小故事 (踩到的坑)**:JVM 的 `ldc2_w` 推上堆疊的其實是「常數池索引」而非 double 值本身,
+> 所以 `dastore` (存進陣列) 必須先用 `get_double_parameter` 把索引換回真正的 double — 否則初始化
+> `a[0]=1.1` 會存進垃圾,矩陣全變 0。Dalvik 端則是 64 位元值要正確地拆/拼到「暫存器對」,本專案
+> 直接沿用既有 `add-double/2addr` 的存取慣例以確保一致。
+>
+> 列印 double:`%g` 格式 (例 `9.35`);真實 JVM 因全精度會印 `9.350000000000001`,數值相同、
+> 只是顯示精簡。
+
+為它新增的 opcode:
+
+| 能力 | JVM 新增 | Dalvik 新增 |
+|---|---|---|
+| double 陣列讀 / 寫 | `daload` / `dastore` | `aget-wide` / `aput-wide` |
+| double 區域變數 | `dload` / `dstore` | (暫存器對) |
+| double 常數 / 0.0 | `dconst_0` | `const-wide` / `const-wide/16` |
+| `newarray` 支援 `double[]` | (擴充 atype) | (偵測 `[D` 型別) |
+
 ### 更多運算 — Ops 範例 (取模 / 位元 / 比較 / 負數)
 
 `Ops.java` (JVM) / `OpsDvm.java` (DVM) 再示範一批常見運算與控制流,進一步擴大 opcode 覆蓋:
@@ -198,6 +238,8 @@ test/          golden 回歸測試 (run_golden.sh / run_e2e.sh + golden/)
 Foo1.java      基本範例 (算術 + 列印);Foo1.class / Foo1.dex 為 fixture
 GEMM.java      JVM 版矩陣乘法 (陣列+迴圈);GEMM.class 為 fixture
 GEMMDvm.java   DVM 版矩陣乘法;GEMMDvm.dex 為 fixture
+GEMMf.java     JVM 版浮點矩陣乘法 (double, 真小數);GEMMf.class 為 fixture
+GEMMfDvm.java  DVM 版浮點矩陣乘法;GEMMfDvm.dex 為 fixture
 Ops.java       JVM 版運算示範 (取模/位元/比較/負數);Ops.class 為 fixture
 OpsDvm.java    DVM 版運算示範;OpsDvm.dex 為 fixture
 examples/      與 VM 無關的小範例 (c_cpp_linkage)
@@ -253,7 +295,7 @@ golden 測試以固定亂數種子 `SVM_SEED` 跑,比對輸出與 `test/golden/`
 - 以整數運算為主,型別系統不完整。
 - 固定大小的 pool / register bank (例: `regs[32]`、`utf8CP[200]`),未做動態擴張。
 - 僅實作範例 (Foo1 / GEMM) 用到的 bytecode 與 `java.lang.*` 子集。
-- 陣列只支援 **一維 int 陣列** (handle-based,無物件模型 / GC / 多維 / 物件陣列)。
+- 陣列只支援 **一維 int / double 陣列** (handle-based,無物件模型 / GC / 多維 / 物件陣列)。
 - 字串串接需 JDK 8 編譯;`.dex` 需 `dx` 以 `-target 1.6` 產生。
 - DVM 的方法查找是為範例結構簡化的 (`class_idx = i-1`),換複雜程式可能要調整。
 
