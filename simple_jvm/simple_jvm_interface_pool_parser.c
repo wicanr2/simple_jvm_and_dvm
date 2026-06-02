@@ -19,6 +19,7 @@ int parseIPClass( FILE *fp, int index ) {
     ptr->stringIndex = short_tmp[0] << 8 | short_tmp[1];
 
     simpleInterfacePool.clasz_used++;
+    return 0;
 }
 
 void printInterfacePool( SimpleConstantPool *p, SimpleInterfacePool *ip) {

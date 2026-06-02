@@ -1,7 +1,7 @@
 #include "simple_dvm.h"
 #include "simple_dvm_java_lib.h"
 int find_const_string(DexFileFormat *dex, char *entry) {
-    int i = 0;
+    unsigned int i = 0;
     for ( i = 0 ; i < dex->header.stringIdsSize ; i++ ) {
         if ( memcmp(dex->string_data_item[i].data, entry, strlen(entry)) == 0 )
         {
@@ -19,7 +19,7 @@ void printRegs(  simple_dalvik_vm *vm ) {
         printf("pc = %08x\n", vm->pc);
         for ( i = 0 ; i < 16 ; i ++ ) {
             printf("Reg[%2d] = %4d (%04x) ",
-                    i, vm->regs[i], vm->regs[i]);
+                    i, *(int *)vm->regs[i].data, *(unsigned int *)vm->regs[i].data);
             if ( (i+1)%4 == 0 ) printf("\n");
         }
     }
@@ -217,8 +217,7 @@ int op_utils_invoke_35c_parse(
         invoke_parameters *p)
 {
     unsigned char tmp = 0;
-    int i = 0;
-    if ( dex != 0 && ptr != 0 && p != 0 ) { 
+    if ( dex != 0 && ptr != 0 && p != 0 ) {
         memset(p, 0, sizeof(invoke_parameters));
 
         tmp = ptr[*pc+1];
@@ -355,10 +354,8 @@ int op_utils_invoke( char *name, DexFileFormat *dex, simple_dalvik_vm *vm, invok
  * 6E53 0600 0421 - invoke-virtual { v4, v0, v1, v2, v3}, Test2.method5:(IIII)V // method@0006
  * 6e20 0200 3200   invoke-virtual {v2, v3}, Ljava/io/PrintStream;.println:(Ljava/lang/String;)V // method@0002
  * */
-int op_invoke_virtual ( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc ) 
+int op_invoke_virtual ( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
 {
-    int string_id = 0;
-
     op_utils_invoke_35c_parse(dex, ptr, pc, &vm->p);
     op_utils_invoke("invoke-virtual", dex, vm, &vm->p);
     //TODO
@@ -368,11 +365,8 @@ int op_invoke_virtual ( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *
 }
 // invoke-direct
 // 7010 0400 0300  invoke-direct {v3}, Ljava/lang/StringBuilder;.<init>:()V // method@0004
-int op_invoke_direct ( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc ) 
+int op_invoke_direct ( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
 {
-    invoke_parameters p;
-    int string_id = 0;
-
     op_utils_invoke_35c_parse(dex, ptr, pc, &vm->p);
     op_utils_invoke("invoke-direct", dex, vm, &vm->p);
     //TODO
@@ -382,11 +376,8 @@ int op_invoke_direct ( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *p
 }
 // 0x71 invoke-direct
 // 7100 0300 0000  invoke-static {}, Ljava/lang/Math;.random:()D // method@0003
-int op_invoke_static ( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc ) 
+int op_invoke_static ( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
 {
-    invoke_parameters p;
-    int string_id = 0;
-
     op_utils_invoke_35c_parse(dex, ptr, pc, &vm->p);
     op_utils_invoke("invoke-static", dex, vm, &vm->p);
     //TODO
@@ -535,7 +526,6 @@ int op_double_to_int
     double d=0;
     unsigned char *ptr_d = (unsigned char*)&d;
     int i=0;
-    int i2 =0 ;
     reg_idx_vx = ptr[*pc+1] & 0x0F ;
     reg_idx_vy = (ptr[*pc+1] >> 4) & 0x0F ;
     reg_idx_vz = reg_idx_vy +1  ;
@@ -598,7 +588,8 @@ int op_add_double_2addr
 
     if ( is_verbose() ) {
         printf("add-double/2addr v%d, v%d\n", reg_idx_vx, reg_idx_vy );
-        printf("%f(%llx) + %f(%llx) = %f\n", x,x, y,y , y+x );
+        printf("%f(%llx) + %f(%llx) = %f\n",
+               x, *(unsigned long long *)&x, y, *(unsigned long long *)&y, y+x );
     }
     x = x + y;
     store_double_to_reg(vm, reg_idx_vx, ptr_x+4);
@@ -745,7 +736,7 @@ void runMethod (DexFileFormat *dex, simple_dalvik_vm *vm, encoded_method *m )
         func= findOpCodeFunc( opCode );
         if ( func != 0 ) {
             //printRegs(vm);
-            func( dex, vm, ptr, &vm->pc );
+            func( dex, vm, ptr, (int *)&vm->pc );
             //printRegs(vm);
         } else {
             printRegs(vm);
@@ -768,8 +759,8 @@ void simple_dvm_startup(DexFileFormat *dex, simple_dalvik_vm *vm, char *entry)
         printf("no method %s in dex\n", entry);
         return ;
     }
-    for ( i = 0 ; i < dex->header.methodIdsSize; i++ ) {
-        if ( dex->method_id_item[i].name_idx == method_name_idx )
+    for ( i = 0 ; i < (int)dex->header.methodIdsSize; i++ ) {
+        if ( (int)dex->method_id_item[i].name_idx == method_name_idx )
         {
             if ( is_verbose() > 2 ) {
                 printf("find %s in class_idx[%d], method_id = %d\n", 

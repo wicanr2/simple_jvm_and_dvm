@@ -29,10 +29,10 @@ int parseAttr( FieldInfo *ptr, FILE *fp ) {
         tmp->info = (unsigned char *) malloc(sizeof(unsigned char) * tmp->attribute_length );
         fread( tmp->info, tmp->attribute_length, 1, fp );
     }
+    return 0;
 } 
 // parse Field Pool 
 int parseFP( FILE *fp ) {
-    int i = 0;
     unsigned char short_tmp[2];
     FieldInfo *ptr = &simpleFieldPool.field[ simpleFieldPool.field_used ];
 

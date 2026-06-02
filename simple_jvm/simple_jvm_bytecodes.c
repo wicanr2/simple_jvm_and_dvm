@@ -258,7 +258,7 @@ int op_irem( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) 
     int value2 = popInt(stack);
     int result = 0;
     result = value2 % value1;
-    JVM_LOG("irem: %d % %d = %d\n", value2, value1, result);
+    JVM_LOG("irem: %d %% %d = %d\n", value2, value1, result);
     pushInt(stack, result);
     *opCode = *opCode + 1;
     return 0;
@@ -359,6 +359,7 @@ int op_invokestatic( unsigned char **opCode, StackFrame *stack, SimpleConstantPo
             JVM_LOG("call method type %s\n", method_type);
             int ret = invoke_java_lang_library(stack,p,
                     clsName,method_name,method_type);
+            (void)ret;
 #if SIMPLE_JVM_DEBUG
             if ( ret ) {
                 printf("invoke java lang library successful\n");
@@ -476,6 +477,7 @@ int op_new( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     tmp[1] = opCode[0][2];
     object_ref= tmp[0] << 8 | tmp[1];
     JVM_LOG("new: new object_ref %d\n", object_ref );
+    (void)object_ref;
     *opCode = *opCode + 3;
     return 0;
 }
@@ -568,12 +570,12 @@ int convertToCodeAttribute( CodeAttribute *ca, AttributeInfo *attr) {
     ca->code_length = tmp[0] << 24 | tmp[1] << 16 | tmp[2] << 8 | tmp[3];
     ca->code = (unsigned char*)malloc(sizeof(unsigned char) * ca->code_length);
     memcpy( ca->code, attr->info + info_p, ca->code_length ); 
+    return 0;
 }
 
 int executeMethod( MethodInfo *startup, StackFrame *stack, SimpleConstantPool *p ) {
     int i = 0;
     int j = 0;
-    int tmp = 0;
     char name[255];
     CodeAttribute ca;
     memset( &ca, 0 , sizeof(CodeAttribute));
@@ -604,13 +606,13 @@ int executeMethod( MethodInfo *startup, StackFrame *stack, SimpleConstantPool *p
 #endif
         } while (1) ;
     }
+    return 0;
 }
 
 void printCodeAttribute( CodeAttribute *ca, SimpleConstantPool *p ) {
     int i = 0;
     int tmp = 0;
     char name[255];
-    unsigned char opCode = 0;
     getUTF8String(p,ca->attribute_name_index,255,name);
     printf("attribute name : %s\n", name );
     printf("attribute length: %d\n", ca->attribute_length );

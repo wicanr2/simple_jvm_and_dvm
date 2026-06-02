@@ -12,7 +12,7 @@ extern SimpleMethodPool simpleMethodPool;
 void free_pools() 
 {
     int i = 0;
-    int j, k = 0;
+    int j;
     MethodInfo *method =0;
     AttributeInfo *attr = 0;
     for ( i = 0 ; i < simpleMethodPool.method_used; i++ ) {

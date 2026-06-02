@@ -53,7 +53,7 @@ void parse_type_list (
         unsigned char *buf, int offset ) {
     int i = 0;
     if ( is_verbose() > 3 ) {
-        printf("parse type_list offset = %04x\n", offset + sizeof(DexHeader) );
+        printf("parse type_list offset = %04x\n", (unsigned)(offset + sizeof(DexHeader)) );
     }
     memcpy( &dex->type_list.size , buf + offset, 4 );
     if ( is_verbose() > 3 ) {
@@ -61,7 +61,7 @@ void parse_type_list (
     }
     if ( dex->type_list.size > 0 ) {
         dex->type_list.type_item = malloc(sizeof(type_item) * dex->type_list.size);
-        for ( i = 0 ; i < dex->type_list.size; i++ ) {
+        for ( i = 0 ; i < (int)dex->type_list.size; i++ ) {
             memcpy( &dex->type_list.type_item[i], 
                     buf + offset + 4 + (sizeof (type_item) * i),
                     sizeof(type_item)); 
@@ -85,7 +85,7 @@ void parse_map_item (
     memcpy( &dex->map_list.map_item[index], buf + offset, sizeof(map_item) );
     size_in_bytes = 4 + (dex->map_list.map_item[index].size*2);
     if ( is_verbose() > 3 ) {
-        printf("offset = %04x ", offset + sizeof(DexHeader));
+        printf("offset = %04x ", (unsigned)(offset + sizeof(DexHeader)));
         printf("map_item[%d] : type = %04x(%s), size = %04x, offset = 0x%04x, item_size_in_byte = %d\n", 
                 index,
                 dex->map_list.map_item[index].type,
@@ -107,12 +107,12 @@ void parse_map_item (
  */
 void parse_map_list(DexFileFormat *dex, unsigned char *buf, int offset) {
     int i = 0;
-    printf("parse map_list offset = %04x\n", offset + sizeof(DexHeader) );
+    printf("parse map_list offset = %04x\n", (unsigned)(offset + sizeof(DexHeader)) );
     memcpy( &dex->map_list.size , buf + offset, 4 );
     printf("map_list size = %d\n", dex->map_list.size);
     if ( dex->map_list.size > 0 ) {
         dex->map_list.map_item = malloc(sizeof(map_item) * dex->map_list.size);
-        for ( i = 0 ; i < dex->map_list.size; i++ ) {
+        for ( i = 0 ; i < (int)dex->map_list.size; i++ ) {
             parse_map_item( dex, buf, offset+4 + (sizeof(map_item)*i), i);
         }
     }

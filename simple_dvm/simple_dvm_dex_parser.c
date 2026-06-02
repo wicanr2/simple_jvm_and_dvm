@@ -64,7 +64,7 @@ int parseDexFile( char *file, DexFileFormat *dex ) {
         printf("Open file %s failed\n", file);
         return -1;
     }
-    memset( dex, 0, sizeof(dex) );
+    memset( dex, 0, sizeof(*dex) ); /* 修正: 原為 sizeof(dex) 只清了指標大小 (8 bytes) */
     fread(&dex->header, sizeof(DexHeader), 1, fp); 
     buf = (unsigned char *) malloc( 
             sizeof(u1) * (dex->header.fileSize - sizeof(DexHeader)));

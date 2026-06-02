@@ -77,12 +77,27 @@ build/simple_jvm Foo1.class
 build/simple_dvm Foo1.dex
 ```
 
-## 尚未處理 (建議後續)
+## Phase E 進度
+
+### E-1 debug log 收斂 (完成)
+JVM `bytecodes.c` / `java_lib.c` 共 49 處純 printf 的 `#if SIMPLE_JVM_DEBUG` 區塊改用
+`JVM_LOG()` 巨集 (release no-op, debug = printf);保留 2 個含函式呼叫/條件的區塊。
+golden 強化: 新增 jvm/dvm debug build 案例 (release+debug 共 4 份 golden)。
+
+### E-3 清 warning + demo 移位 (完成)
+release / debug build 皆 **0 warning** (原 85 個)。重點:
+- **真 bug**: `simple_dvm_dex_parser.c` `memset(dex,0,sizeof(dex))` → `sizeof(*dex)`
+  (原只清了指標大小 8 bytes,靠全域變數預設歸零才沒爆)。
+- 16 個 `-Wreturn-type` (缺 return 的 UB 風險) 補 `return 0;`。
+- sign-compare / format / unused / pointer-sign 逐一修正,皆不改變輸出 (golden 驗證)。
+- `test/{a,b}.cpp`、`test/main.c` (與 VM 無關的 demo) 移到 `examples/c_cpp_linkage/`。
+
+### E-2 JVM 全域狀態 → context struct (尚未做)
+6 個 global (`simpleConstantPool` 等) 包成 context 顯式傳遞,向 DVM 風格靠攏。
+動到每個 JVM parser,風險中高;golden (release) 可護住。建議單獨一個 commit 小步進行。
+
+## 其他可選後續
 
 | 項目 | 風險 | 說明 |
 |---|---|---|
-| debug log 收斂成 `JVM_LOG()` | 中 | JVM 各 op 散落的 `#if SIMPLE_JVM_DEBUG printf` 統一 |
-| JVM 全域狀態 → context struct | 中高 | 6 個 global 包成 context 顯式傳遞,向 DVM 風格靠攏 (動到每個 parser) |
-| 清 85 個 `-Wall -Wextra` warning | 低 | 多為 sign-compare / format,原本就在,本次才揭露 |
-| `test/{a,b}.cpp`, `test/main.c` | — | 與 VM 無關的 C/C++ 連結 demo,待決定移除或移出 |
 | 從 `Foo1.java` 全鏈重生 class/dex | 低 | 需在 docker 裝 jdk + dx,可選 |

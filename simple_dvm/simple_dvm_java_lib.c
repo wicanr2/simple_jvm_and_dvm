@@ -41,7 +41,6 @@ static int use_buf = 0;
 int java_io_print_stream_println( DexFileFormat *dex, simple_dalvik_vm *vm, char*type )
 {
     invoke_parameters *p = &vm->p;
-    int i = 0;
     int string_id = 0;
     if ( is_verbose() ) {
         printf("call java.io.PrintStream.println\n");
@@ -61,7 +60,6 @@ int java_io_print_stream_println( DexFileFormat *dex, simple_dalvik_vm *vm, char
 //java.lang.StringBuilder.<init>
 int java_lang_string_builder_init( DexFileFormat *dex, simple_dalvik_vm *vm, char*type )
 {
-    invoke_parameters *p = &vm->p;
     if ( is_verbose() ) {
         printf("call java.lang.StringBuilder.<init>\n");
     }
@@ -89,7 +87,6 @@ int java_lang_string_builder_append( DexFileFormat *dex, simple_dalvik_vm *vm, c
 }
 int java_lang_string_builder_to_string( DexFileFormat *dex, simple_dalvik_vm *vm, char*type )
 {
-    invoke_parameters *p = &vm->p;
     if ( is_verbose() ) {
         printf("call java.lang.StringBuilder.toString\n");
     }

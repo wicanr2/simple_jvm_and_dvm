@@ -16,7 +16,6 @@
 int main(int argc, char* argv[]) {
     DexFileFormat dex;
     simple_dalvik_vm vm;
-    int x = 0;
 
     memset( &dex, 0, sizeof(DexFileFormat));
 #if 1
