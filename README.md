@@ -148,6 +148,31 @@ build/simple_dvm GEMMDvm.dex     # Dalvik (register-based) 版
 > **分支怎麼做的**:opcode 收到目前指令的位置,bytecode 裡的 offset 是相對位移,把它加到
 > `pc` 就跳到目標。Dalvik 的 offset 以 **16-bit code unit** 計 (要 ×2 換成 byte),JVM 以 byte 計。
 
+### 更多運算 — Ops 範例 (取模 / 位元 / 比較 / 負數)
+
+`Ops.java` (JVM) / `OpsDvm.java` (DVM) 再示範一批常見運算與控制流,進一步擴大 opcode 覆蓋:
+歐幾里得 GCD (取模 + while)、階乘 (for 迴圈)、位元 AND/OR/XOR、min/max (三元/比較分支)、負數。
+
+```bash
+build/simple_jvm Ops.class       # JVM
+build/simple_dvm OpsDvm.dex      # DVM
+# gcd(48,36)=12  6!=720  240&60=48  240|60=252  240^60=204  max=12  min=7  -7=-7
+```
+
+為它新增的 opcode:
+
+| 能力 | JVM 新增 | Dalvik 新增 |
+|---|---|---|
+| 位元 AND/OR/XOR | `iand` / `ior` / `ixor` | (被 dx 常數摺疊,無需新增) |
+| 取負 | `ineg` | `neg-int` |
+| 取模 | (已有 `irem`) | `rem-int/2addr` |
+| 與 0 比較分支 | `ifeq` | `if-eqz` |
+| 大於 / 小於等於分支 | `if_icmpgt` / `if_icmple` | `if-gt` |
+
+> **有趣的對照**:同一份 Java,**JVM 端 javac 保留了 `iand`/`ior`/`ixor`,但 DVM 端的 `dx`
+> 把 `240 & 60` 這種「常數運算」直接算成結果塞進 `const`** (constant folding) — 所以 Dalvik 版
+> 反而少補幾個 opcode。位移 `5 << 3` 兩邊都被摺疊掉了。這說明不同工具鏈的最佳化程度不同。
+
 ### 重新產生 class / dex (需 docker,符合本專案 docker-first 原則)
 
 字串串接 (`"c = " + x`) 必須用 **JDK 8** 編譯:JDK 9+ 會編成 `invokedynamic`,本 VM 不支援;
@@ -173,6 +198,8 @@ test/          golden 回歸測試 (run_golden.sh / run_e2e.sh + golden/)
 Foo1.java      基本範例 (算術 + 列印);Foo1.class / Foo1.dex 為 fixture
 GEMM.java      JVM 版矩陣乘法 (陣列+迴圈);GEMM.class 為 fixture
 GEMMDvm.java   DVM 版矩陣乘法;GEMMDvm.dex 為 fixture
+Ops.java       JVM 版運算示範 (取模/位元/比較/負數);Ops.class 為 fixture
+OpsDvm.java    DVM 版運算示範;OpsDvm.dex 為 fixture
 examples/      與 VM 無關的小範例 (c_cpp_linkage)
 lib/           smali / baksmali / dx (產生 / 反組譯 dex 的工具)
 Makefile / Dockerfile / build.sh   docker-first build

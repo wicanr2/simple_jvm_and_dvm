@@ -808,6 +808,70 @@ int op_if_ge( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
     }
     return 0;
 }
+//==================================================================
+// 一元 / 取模 / 比較分支 opcode (OpsDvm 範例所需)
+//==================================================================
+// 0x7b neg-int vA, vB : vA = -vB  (12x)
+int op_neg_int( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
+{
+    int vA = ptr[*pc+1] & 0x0F;
+    int vB = (ptr[*pc+1] >> 4) & 0x0F;
+    int v = 0;
+    load_reg_to(vm, vB, (unsigned char*)&v);
+    v = -v;
+    store_to_reg(vm, vA, (unsigned char*)&v);
+    if ( is_verbose() ) printf("neg-int v%d, v%d = %d\n", vA, vB, v);
+    *pc = *pc + 2;
+    return 0;
+}
+// 0xb4 rem-int/2addr vA, vB : vA = vA %% vB  (12x)
+int op_rem_int_2addr( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
+{
+    int vA = ptr[*pc+1] & 0x0F;
+    int vB = (ptr[*pc+1] >> 4) & 0x0F;
+    int x = 0, y = 0;
+    load_reg_to(vm, vA, (unsigned char*)&x);
+    load_reg_to(vm, vB, (unsigned char*)&y);
+    if ( y != 0 ) x = x % y;
+    store_to_reg(vm, vA, (unsigned char*)&x);
+    if ( is_verbose() ) printf("rem-int/2addr v%d, v%d = %d\n", vA, vB, x);
+    *pc = *pc + 2;
+    return 0;
+}
+// 0x38 if-eqz vAA, +CCCC : vAA==0 則跳 (16-bit signed, code unit)  (21t)
+int op_if_eqz( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
+{
+    int vAA = ptr[*pc+1];
+    short off = (short)((ptr[*pc+3] << 8) | ptr[*pc+2]);
+    int x = 0;
+    load_reg_to(vm, vAA, (unsigned char*)&x);
+    if ( x == 0 ) {
+        if ( is_verbose() ) printf("if-eqz v%d==0: branch %+d\n", vAA, (int)off);
+        *pc = *pc + off * 2;
+    } else {
+        if ( is_verbose() ) printf("if-eqz v%d==0: fall through\n", vAA);
+        *pc = *pc + 4;
+    }
+    return 0;
+}
+// 0x36 if-gt vA, vB, +CCCC : vA>vB 則跳 (16-bit signed, code unit)  (22t)
+int op_if_gt( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
+{
+    int vA = ptr[*pc+1] & 0x0F;
+    int vB = (ptr[*pc+1] >> 4) & 0x0F;
+    short off = (short)((ptr[*pc+3] << 8) | ptr[*pc+2]);
+    int x = 0, y = 0;
+    load_reg_to(vm, vA, (unsigned char*)&x);
+    load_reg_to(vm, vB, (unsigned char*)&y);
+    if ( x > y ) {
+        if ( is_verbose() ) printf("if-gt v%d>v%d (%d>%d): branch %+d\n", vA, vB, x, y, (int)off);
+        *pc = *pc + off * 2;
+    } else {
+        if ( is_verbose() ) printf("if-gt v%d>v%d (%d>%d): fall through\n", vA, vB, x, y);
+        *pc = *pc + 4;
+    }
+    return 0;
+}
 byteCode byteCodes[] = {
     { "move-result-wide"  , 0x0B, 2,  op_move_result_wide },
     { "move-result-object", 0x0C, 2,  op_move_result_object },
@@ -837,7 +901,11 @@ byteCode byteCodes[] = {
     { "mul-int/2addr"     , 0xb2, 2,  op_mul_int_2addr },
     { "add-int/lit8"      , 0xd8, 4,  op_add_int_lit8 },
     { "goto"              , 0x28, 2,  op_goto },
-    { "if-ge"             , 0x35, 4,  op_if_ge }
+    { "if-ge"             , 0x35, 4,  op_if_ge },
+    { "neg-int"           , 0x7b, 2,  op_neg_int },
+    { "rem-int/2addr"     , 0xb4, 2,  op_rem_int_2addr },
+    { "if-eqz"            , 0x38, 4,  op_if_eqz },
+    { "if-gt"             , 0x36, 4,  op_if_gt }
 };
 static int byteCode_size = sizeof(byteCodes)/ sizeof(byteCode);
 
