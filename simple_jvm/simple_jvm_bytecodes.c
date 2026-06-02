@@ -48,15 +48,11 @@ double get_double_parameter( StackFrame *stack, SimpleConstantPool *p )
     if ( is_ref_entry(stack) ) {
         int index = popInt(stack);
         value = get_double_from_constant_pool(p, index);
-#if SIMPLE_JVM_DEBUG
-        printf("index %d\n", index);
-        printf("get value from constant pool = %f\n", value);
-#endif
+        JVM_LOG("index %d\n", index);
+        JVM_LOG("get value from constant pool = %f\n", value);
     } else {
         value = popDouble(stack);
-#if SIMPLE_JVM_DEBUG
-        printf("get value from stack = %f\n", value);
-#endif
+        JVM_LOG("get value from stack = %f\n", value);
     }
     return value;
 }
@@ -64,9 +60,7 @@ double get_double_parameter( StackFrame *stack, SimpleConstantPool *p )
 // aload_0
 int op_aload_0( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     pushInt(stack, 0);
-#if SIMPLE_JVM_DEBUG
-    printf("push 0 into stack\n");
-#endif
+    JVM_LOG("push 0 into stack\n");
     *opCode = *opCode + 1;
     return 0;
 }
@@ -74,9 +68,7 @@ int op_aload_0( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p
 int op_bipush( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     int value = opCode[0][1];
     pushInt(stack, value);
-#if SIMPLE_JVM_DEBUG
-    printf("push a byte %d onto the stack \n", value);
-#endif
+    JVM_LOG("push a byte %d onto the stack \n", value);
     *opCode = *opCode + 2;
     return 0;
 }
@@ -93,9 +85,7 @@ int op_dup( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
         pushRef(stack, value);
         pushRef(stack, value);
     }
-#if SIMPLE_JVM_DEBUG
-    printf("dup\n");
-#endif
+    JVM_LOG("dup\n");
     *opCode = *opCode + 1;
     return 0;
 }
@@ -106,9 +96,7 @@ int op_getstatic( unsigned char **opCode, StackFrame *stack, SimpleConstantPool 
     tmp[0] = opCode[0][1];
     tmp[1] = opCode[0][2];
     field_index = tmp[0] << 8 | tmp[1];
-#if SIMPLE_JVM_DEBUG
-    printf("getstatic %d\n", field_index );
-#endif
+    JVM_LOG("getstatic %d\n", field_index );
     pushRef(stack, field_index);
     *opCode = *opCode + 3;
     return 0;
@@ -119,9 +107,7 @@ int op_iadd( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) 
     int value2 = popInt(stack);
     int result = 0;
     result = value1 + value2;
-#if SIMPLE_JVM_DEBUG
-    printf("iadd: %d + %d = %d\n",value1, value2, result);
-#endif
+    JVM_LOG("iadd: %d + %d = %d\n",value1, value2, result);
     pushInt(stack, result); 
     *opCode = *opCode + 1;
     return 0;
@@ -129,63 +115,49 @@ int op_iadd( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) 
 // iconst_0
 int op_iconst_0( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     pushInt(stack, 0);
-#if SIMPLE_JVM_DEBUG
-    printf("iconst_0: push 0 into stack\n");
-#endif
+    JVM_LOG("iconst_0: push 0 into stack\n");
     *opCode = *opCode + 1;
     return 0;
 }
 // iconst_1
 int op_iconst_1( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     pushInt(stack, 1);
-#if SIMPLE_JVM_DEBUG
-    printf("iconst_1: push 1 into stack\n");
-#endif
+    JVM_LOG("iconst_1: push 1 into stack\n");
     *opCode = *opCode + 1;
     return 0;
 }
 // iconst_2
 int op_iconst_2( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     pushInt(stack, 2);
-#if SIMPLE_JVM_DEBUG
-    printf("iconst_2: push 1 into stack\n");
-#endif
+    JVM_LOG("iconst_2: push 1 into stack\n");
     *opCode = *opCode + 1;
     return 0;
 }
 // iconst_3
 int op_iconst_3( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     pushInt(stack, 3);
-#if SIMPLE_JVM_DEBUG
-    printf("iconst_3: push 1 into stack\n");
-#endif
+    JVM_LOG("iconst_3: push 1 into stack\n");
     *opCode = *opCode + 1;
     return 0;
 }
 // iconst_4
 int op_iconst_4( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     pushInt(stack, 4);
-#if SIMPLE_JVM_DEBUG
-    printf("iconst_4: push 1 into stack\n");
-#endif
+    JVM_LOG("iconst_4: push 1 into stack\n");
     *opCode = *opCode + 1;
     return 0;
 }
 // iconst_5
 int op_iconst_5( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     pushInt(stack, 5);
-#if SIMPLE_JVM_DEBUG
-    printf("iconst_5: push 5 into stack\n");
-#endif
+    JVM_LOG("iconst_5: push 5 into stack\n");
     *opCode = *opCode + 1;
     return 0;
 }
 //0x0F dconst_1
 int op_dconst_1( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     pushDouble(stack, 1.0f);
-#if SIMPLE_JVM_DEBUG
-    printf("iconst_5: push 1.0f into stack\n");
-#endif
+    JVM_LOG("iconst_5: push 1.0f into stack\n");
     *opCode = *opCode + 1;
     return 0;
 }
@@ -195,9 +167,7 @@ int op_idiv( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) 
     int value1 = popInt(stack);
     int result = 0;
     result = value1 / value2;
-#if SIMPLE_JVM_DEBUG
-    printf("idiv: %d / %d = %d\n", value1, value2, result);
-#endif
+    JVM_LOG("idiv: %d / %d = %d\n", value1, value2, result);
     pushInt(stack, result); 
     *opCode = *opCode + 1;
     return 0;
@@ -207,9 +177,7 @@ int op_idiv( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) 
 int op_iload( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     int index = opCode[0][1];
     int value = localVariables.integer[index];
-#if SIMPLE_JVM_DEBUG
-    printf("iload: load value from local variable %d(%d)\n", index, localVariables.integer[index]);
-#endif
+    JVM_LOG("iload: load value from local variable %d(%d)\n", index, localVariables.integer[index]);
     pushInt(stack, value);
     *opCode = *opCode + 2;
     return 0;
@@ -218,9 +186,7 @@ int op_iload( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p )
 //iload_1
 int op_iload_1( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     int value = localVariables.integer[1];
-#if SIMPLE_JVM_DEBUG
-    printf("iload_1: load value from local variable 1(%d)\n", localVariables.integer[1]);
-#endif
+    JVM_LOG("iload_1: load value from local variable 1(%d)\n", localVariables.integer[1]);
     pushInt(stack, value);
     *opCode = *opCode + 1;
     return 0;
@@ -229,9 +195,7 @@ int op_iload_1( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p
 //iload_2
 int op_iload_2( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     int value = localVariables.integer[2];
-#if SIMPLE_JVM_DEBUG
-    printf("iload_2: load value from local variable 2(%d)\n", localVariables.integer[2]);
-#endif
+    JVM_LOG("iload_2: load value from local variable 2(%d)\n", localVariables.integer[2]);
     pushInt(stack, value);
     *opCode = *opCode + 1;
     return 0;
@@ -239,9 +203,7 @@ int op_iload_2( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p
 //iload_3
 int op_iload_3( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     int value = localVariables.integer[3];
-#if SIMPLE_JVM_DEBUG
-    printf("iload_3: load value from local variable 3(%d)\n",localVariables.integer[3]);
-#endif
+    JVM_LOG("iload_3: load value from local variable 3(%d)\n",localVariables.integer[3]);
     pushInt(stack, value);
     *opCode = *opCode + 1;
     return 0;
@@ -252,9 +214,7 @@ int op_imul( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) 
     int value2 = popInt(stack);
     int result = 0;
     result = value1 * value2;
-#if SIMPLE_JVM_DEBUG
-    printf("imul: %d * %d = %d\n", value1, value2, result);
-#endif
+    JVM_LOG("imul: %d * %d = %d\n", value1, value2, result);
     pushInt(stack, result); 
     *opCode = *opCode + 1;
     return 0;
@@ -265,9 +225,7 @@ int op_dadd( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) 
     double value2 = get_double_parameter(stack,p);
     double result = 0;
     result = value1 + value2;
-#if SIMPLE_JVM_DEBUG
-    printf("dadd: %f + %f = %f\n", value1, value2, result);
-#endif
+    JVM_LOG("dadd: %f + %f = %f\n", value1, value2, result);
     pushDouble(stack, result); 
     *opCode = *opCode + 1;
     return 0;
@@ -279,9 +237,7 @@ int op_dmul( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) 
     double value2 = get_double_parameter(stack,p);
     double result = 0;
     result = value1 * value2;
-#if SIMPLE_JVM_DEBUG
-    printf("dmul: %f * %f = %f\n", value1, value2, result);
-#endif
+    JVM_LOG("dmul: %f * %f = %f\n", value1, value2, result);
     pushDouble(stack, result); 
     *opCode = *opCode + 1;
     return 0;
@@ -291,9 +247,7 @@ int op_d2i( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     double value1 = popDouble(stack);
     int result = 0;
     result = (int)value1;
-#if SIMPLE_JVM_DEBUG
-    printf("d2i: %d <-- %f\n", result, value1);
-#endif
+    JVM_LOG("d2i: %d <-- %f\n", result, value1);
     pushInt(stack, result); 
     *opCode = *opCode + 1;
     return 0;
@@ -304,9 +258,7 @@ int op_irem( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) 
     int value2 = popInt(stack);
     int result = 0;
     result = value2 % value1;
-#if SIMPLE_JVM_DEBUG
-    printf("irem: %d % %d = %d\n", value2, value1, result);
-#endif
+    JVM_LOG("irem: %d % %d = %d\n", value2, value1, result);
     pushInt(stack, result);
     *opCode = *opCode + 1;
     return 0;
@@ -315,9 +267,7 @@ int op_irem( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) 
 int op_istore( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     int value = popInt(stack);
     int index = opCode[0][1];
-#if SIMPLE_JVM_DEBUG
-    printf("istore: store value into local variable %d(%d)\n", index, value);
-#endif
+    JVM_LOG("istore: store value into local variable %d(%d)\n", index, value);
     localVariables.integer[index] = value;
     *opCode = *opCode + 2;
     return 0;
@@ -325,9 +275,7 @@ int op_istore( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p 
 //istore_1
 int op_istore_1( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     int value = popInt(stack);
-#if SIMPLE_JVM_DEBUG
-    printf("istore_1: store value into local variable 1(%d)\n", value);
-#endif
+    JVM_LOG("istore_1: store value into local variable 1(%d)\n", value);
     localVariables.integer[1] = value;
     *opCode = *opCode + 1;
     return 0;
@@ -335,9 +283,7 @@ int op_istore_1( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *
 //istore_2
 int op_istore_2( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     int value = popInt(stack);
-#if SIMPLE_JVM_DEBUG
-    printf("istore_2: store value into local variable 2(%d)\n", value);
-#endif
+    JVM_LOG("istore_2: store value into local variable 2(%d)\n", value);
     localVariables.integer[2] = value;
     *opCode = *opCode + 1;
     return 0;
@@ -345,9 +291,7 @@ int op_istore_2( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *
 //istore_3
 int op_istore_3( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     int value = popInt(stack);
-#if SIMPLE_JVM_DEBUG
-    printf("istore_3: store value into local variable 3(%d)\n", value);
-#endif
+    JVM_LOG("istore_3: store value into local variable 3(%d)\n", value);
     localVariables.integer[3] = value;
     *opCode = *opCode + 1;
     return 0;
@@ -358,9 +302,7 @@ int op_isub( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) 
     int value1 = popInt(stack);
     int result = 0;
     result = value1 - value2;
-#if SIMPLE_JVM_DEBUG
-    printf("isub : %d - %d = %d\n", value1, value2, result);
-#endif
+    JVM_LOG("isub : %d - %d = %d\n", value1, value2, result);
     pushInt(stack, result); 
     *opCode = *opCode + 1;
     return 0;
@@ -372,9 +314,7 @@ int op_invokespecial( unsigned char **opCode, StackFrame *stack, SimpleConstantP
     tmp[0] = opCode[0][1];
     tmp[1] = opCode[0][2];
     method_index = tmp[0] << 8 | tmp[1];
-#if SIMPLE_JVM_DEBUG
-    printf("call method_index %d\n", method_index);
-#endif
+    JVM_LOG("call method_index %d\n", method_index);
     *opCode = *opCode + 3;
     if ( method_index < simpleMethodPool.method_used ) {
         MethodInfo *method = &simpleMethodPool.method[method_index];
@@ -396,18 +336,14 @@ int op_invokestatic( unsigned char **opCode, StackFrame *stack, SimpleConstantPo
     tmp[0] = opCode[0][1];
     tmp[1] = opCode[0][2];
     method_index = tmp[0] << 8 | tmp[1];
-#if SIMPLE_JVM_DEBUG
-    printf("invokestatic method_index %d\n", method_index);
-    printf("simpleMethodPool.method_used = %d\n",simpleMethodPool.method_used);
-#endif
+    JVM_LOG("invokestatic method_index %d\n", method_index);
+    JVM_LOG("simpleMethodPool.method_used = %d\n",simpleMethodPool.method_used);
     *opCode = *opCode + 3;
     if ( method_index < simpleMethodPool.method_used ) {
         MethodInfo *method = &simpleMethodPool.method[method_index];
         memset(method_name,0,255);
         getUTF8String(p, method->name_index, 255, method_name);
-#if SIMPLE_JVM_DEBUG
-        printf(" method name = %s\n", method_name );
-#endif
+        JVM_LOG(" method name = %s\n", method_name );
     } else {
         ConstantMethodRef *mRef = findMethodRef(p, method_index );
         if ( mRef != 0 ) {
@@ -418,11 +354,9 @@ int op_invokestatic( unsigned char **opCode, StackFrame *stack, SimpleConstantPo
             getUTF8String(p, nat->nameIndex, 255, method_name);
             getUTF8String(p, nat->typeIndex, 255, method_type);
 
-#if SIMPLE_JVM_DEBUG
-            printf("call class %s\n", clsName);
-            printf("call method %s\n", method_name);
-            printf("call method type %s\n", method_type);
-#endif
+            JVM_LOG("call class %s\n", clsName);
+            JVM_LOG("call method %s\n", method_name);
+            JVM_LOG("call method type %s\n", method_type);
             int ret = invoke_java_lang_library(stack,p,
                     clsName,method_name,method_type);
 #if SIMPLE_JVM_DEBUG
@@ -447,9 +381,7 @@ int op_invokevirtual( unsigned char **opCode, StackFrame *stack, SimpleConstantP
     tmp[0] = opCode[0][1];
     tmp[1] = opCode[0][2];
     object_ref= tmp[0] << 8 | tmp[1];
-#if SIMPLE_JVM_DEBUG
-    printf("call object_ref %d\n", object_ref );
-#endif
+    JVM_LOG("call object_ref %d\n", object_ref );
     *opCode = *opCode + 3;
     ConstantMethodRef *mRef = findMethodRef(p, object_ref );
     if ( mRef != 0 ) {
@@ -457,15 +389,11 @@ int op_invokevirtual( unsigned char **opCode, StackFrame *stack, SimpleConstantP
         ConstantNameAndType *nat = findNameAndType(p, mRef->nameAndTypeIndex );
         if ( clasz == 0 || nat == 0 ) return -1;
         getUTF8String(p, clasz->stringIndex, 255, clsName);
-#if SIMPLE_JVM_DEBUG
-        printf("call object ref class %s\n", clsName);
-#endif
+        JVM_LOG("call object ref class %s\n", clsName);
         if ( strcmp(clzNamePrint, clsName) == 0 ) {
             StackEntry *entry = popEntry(stack);
             int index = EntryToInt(entry);
-#if SIMPLE_JVM_DEBUG
-            printf("call Println with index = %d\n", index);
-#endif
+            JVM_LOG("call Println with index = %d\n", index);
             if ( entry->type == STACK_ENTRY_REF ) {
                 ConstantStringRef *strRef = findStringRef(p, index);
                 if ( strRef != 0 ) {
@@ -489,9 +417,7 @@ int op_invokevirtual( unsigned char **opCode, StackFrame *stack, SimpleConstantP
         } else if ( strcmp(clzNameStrBuilder, clsName) == 0 ){
             StackEntry *entry = popEntry(stack);
             int index = EntryToInt(entry);
-#if SIMPLE_JVM_DEBUG
-            printf("call StringBuilder with index = %d\n", index);
-#endif
+            JVM_LOG("call StringBuilder with index = %d\n", index);
             if ( entry->type == STACK_ENTRY_REF ) {
                 ConstantStringRef *strRef = findStringRef(p, index);
                 if ( strRef != 0 ) {
@@ -505,9 +431,7 @@ int op_invokevirtual( unsigned char **opCode, StackFrame *stack, SimpleConstantP
                 len = strlen(utf8);
                 memcpy( stringBuilderBuffer + stringBuilderUsed, utf8, len);
                 stringBuilderUsed += len;
-#if SIMPLE_JVM_DEBUG
-                printf("%s\n", stringBuilderBuffer); 
-#endif
+                JVM_LOG("%s\n", stringBuilderBuffer); 
             } 
 
         }
@@ -518,9 +442,7 @@ int op_invokevirtual( unsigned char **opCode, StackFrame *stack, SimpleConstantP
 int op_ldc( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     int value = opCode[0][1];
     pushRef(stack, value);
-#if SIMPLE_JVM_DEBUG
-    printf("ldc: push a constant index %d onto the stack \n", value);
-#endif
+    JVM_LOG("ldc: push a constant index %d onto the stack \n", value);
     *opCode = *opCode + 2;
     return 0;
 }
@@ -530,9 +452,7 @@ int op_ldc2_w( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p 
     unsigned char index2 = opCode[0][2];
     int index = ( index1 << 8 ) | index2;
     pushRef(stack, index);
-#if SIMPLE_JVM_DEBUG
-    printf("ldc2_w: push a constant index %d onto the stack \n", index);
-#endif
+    JVM_LOG("ldc2_w: push a constant index %d onto the stack \n", index);
     *opCode = *opCode + 3;
     return 0;
 }
@@ -543,9 +463,7 @@ int op_sipush( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p 
     tmp[0] = opCode[0][1];
     tmp[1] = opCode[0][2];
     value = tmp[0] << 8 | tmp[1];
-#if SIMPLE_JVM_DEBUG
-    printf("sipush value %d\n", value);
-#endif
+    JVM_LOG("sipush value %d\n", value);
     pushInt(stack,value);
     *opCode = *opCode + 3;
     return 0;
@@ -557,18 +475,14 @@ int op_new( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
     tmp[0] = opCode[0][1];
     tmp[1] = opCode[0][2];
     object_ref= tmp[0] << 8 | tmp[1];
-#if SIMPLE_JVM_DEBUG
-    printf("new: new object_ref %d\n", object_ref );
-#endif
+    JVM_LOG("new: new object_ref %d\n", object_ref );
     *opCode = *opCode + 3;
     return 0;
 }
 
 // return
 int op_return( unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p ) {
-#if SIMPLE_JVM_DEBUG
-    printf("return: \n");
-#endif
+    JVM_LOG("return: \n");
     *opCode = *opCode + 1;
     return -1;
 }

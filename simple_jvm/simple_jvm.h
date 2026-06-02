@@ -16,6 +16,16 @@
 typedef unsigned short u2;
 typedef unsigned char byte;
 
+/*
+ * Debug log: SIMPLE_JVM_DEBUG 有定義時展開為 printf, 否則為 no-op (零開銷)。
+ * 取代散落各 op 的 #if SIMPLE_JVM_DEBUG ... printf ... #endif。
+ */
+#ifdef SIMPLE_JVM_DEBUG
+#define JVM_LOG(...) printf(__VA_ARGS__)
+#else
+#define JVM_LOG(...) ((void)0)
+#endif
+
 //---------------------------------
 /*
  Simple Java Class File 

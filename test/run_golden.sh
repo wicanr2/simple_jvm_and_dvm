@@ -22,6 +22,12 @@ run_one() {
     local golden="$GOLDEN/$name.txt"
     local out="$TMP/$name.out"
 
+    # debug 案例: binary 不存在 (未 make debug) 時跳過
+    if [ ! -x "$1" ]; then
+        echo "SKIP  $name  ($1 未 build)"
+        return 0
+    fi
+
     SVM_SEED=$SEED "$@" > "$out" 2>&1
 
     if [ "${UPDATE:-0}" = "1" ]; then
@@ -43,8 +49,10 @@ run_one() {
     fi
 }
 
-run_one jvm_Foo1 build/simple_jvm Foo1.class
-run_one dvm_Foo1 build/simple_dvm Foo1.dex
+run_one jvm_Foo1       build/simple_jvm       Foo1.class
+run_one dvm_Foo1       build/simple_dvm       Foo1.dex
+run_one jvm_Foo1_debug build/simple_jvm_debug Foo1.class
+run_one dvm_Foo1_debug build/simple_dvm_debug Foo1.dex
 
 if [ "$rc" -eq 0 ]; then
     echo "---- all golden tests passed ----"

@@ -25,9 +25,7 @@ int java_lang_math_random ( StackFrame *stack, SimpleConstantPool *p, char*type 
     for ( i = 0 ; i < times ; i++ ) { 
         r =((double)rand()/(double)RAND_MAX);
     }
-#if SIMPLE_JVM_DEBUG
-    printf("rand r = %f\n", r);
-#endif
+    JVM_LOG("rand r = %f\n", r);
     pushDouble( stack, r);
     return 0;
 }
@@ -53,9 +51,7 @@ int invoke_java_lang_library(
 {
     java_lang_method *method = find_java_lang_method(cls_name,method_name);
     if ( method != 0 ) {
-#if SIMPLE_JVM_DEBUG
-        printf("invoke %s/%s %s\n",method->clzname,method->methodname,type);
-#endif
+        JVM_LOG("invoke %s/%s %s\n",method->clzname,method->methodname,type);
         method->method_runtime( stack, p, type );
         return 1;
     }
