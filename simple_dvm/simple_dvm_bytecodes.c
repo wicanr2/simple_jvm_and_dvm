@@ -684,6 +684,130 @@ int op_div_int_lit8( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc 
     return 0;
 
 }
+//==================================================================
+// 陣列 / 迴圈 opcode (GEMM 範例所需)
+//==================================================================
+// 0x23 new-array vA, vB, type@CCCC : vA = new int[vB]  (format 22c)
+int op_new_array( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
+{
+    int vA = ptr[*pc+1] & 0x0F;
+    int vB = (ptr[*pc+1] >> 4) & 0x0F;
+    int count = 0;
+    int handle = vm->array_count;
+    load_reg_to(vm, vB, (unsigned char*)&count);
+    if ( handle < DVM_MAX_ARRAYS ) {
+        vm->array_count++;
+        vm->arrays[handle].length = count;
+        vm->arrays[handle].data = (int*) calloc(count > 0 ? count : 1, sizeof(int));
+    }
+    store_to_reg(vm, vA, (unsigned char*)&handle);
+    if ( is_verbose() )
+        printf("new-array v%d, v%d (int[%d]) -> handle %d\n", vA, vB, count, handle);
+    *pc = *pc + 4;
+    return 0;
+}
+// 0x44 aget vA, vB, vC : vA = array(vB)[vC]  (format 23x)
+int op_aget( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
+{
+    int vA = ptr[*pc+1];
+    int vB = ptr[*pc+2];
+    int vC = ptr[*pc+3];
+    int handle = 0, index = 0, value = 0;
+    load_reg_to(vm, vB, (unsigned char*)&handle);
+    load_reg_to(vm, vC, (unsigned char*)&index);
+    if ( handle >= 0 && handle < vm->array_count &&
+         index >= 0 && index < vm->arrays[handle].length )
+        value = vm->arrays[handle].data[index];
+    store_to_reg(vm, vA, (unsigned char*)&value);
+    if ( is_verbose() )
+        printf("aget v%d, v%d[v%d] = %d\n", vA, vB, vC, value);
+    *pc = *pc + 4;
+    return 0;
+}
+// 0x4b aput vA, vB, vC : array(vB)[vC] = vA  (format 23x)
+int op_aput( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
+{
+    int vA = ptr[*pc+1];
+    int vB = ptr[*pc+2];
+    int vC = ptr[*pc+3];
+    int handle = 0, index = 0, value = 0;
+    load_reg_to(vm, vA, (unsigned char*)&value);
+    load_reg_to(vm, vB, (unsigned char*)&handle);
+    load_reg_to(vm, vC, (unsigned char*)&index);
+    if ( handle >= 0 && handle < vm->array_count &&
+         index >= 0 && index < vm->arrays[handle].length )
+        vm->arrays[handle].data[index] = value;
+    if ( is_verbose() )
+        printf("aput v%d -> v%d[v%d] = %d\n", vA, vB, vC, value);
+    *pc = *pc + 4;
+    return 0;
+}
+// 0x01 move vA, vB : vA = vB  (format 12x)
+int op_move( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
+{
+    int vA = ptr[*pc+1] & 0x0F;
+    int vB = (ptr[*pc+1] >> 4) & 0x0F;
+    int value = 0;
+    load_reg_to(vm, vB, (unsigned char*)&value);
+    store_to_reg(vm, vA, (unsigned char*)&value);
+    if ( is_verbose() ) printf("move v%d, v%d (%d)\n", vA, vB, value);
+    *pc = *pc + 2;
+    return 0;
+}
+// 0xb2 mul-int/2addr vA, vB : vA = vA * vB  (format 12x)
+int op_mul_int_2addr( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
+{
+    int vA = ptr[*pc+1] & 0x0F;
+    int vB = (ptr[*pc+1] >> 4) & 0x0F;
+    int x = 0, y = 0;
+    load_reg_to(vm, vA, (unsigned char*)&x);
+    load_reg_to(vm, vB, (unsigned char*)&y);
+    x = x * y;
+    store_to_reg(vm, vA, (unsigned char*)&x);
+    if ( is_verbose() ) printf("mul-int/2addr v%d, v%d = %d\n", vA, vB, x);
+    *pc = *pc + 2;
+    return 0;
+}
+// 0xd8 add-int/lit8 vA, vB, #C : vA = vB + C  (format 22b)
+int op_add_int_lit8( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
+{
+    int vA = ptr[*pc+1];
+    int vB = ptr[*pc+2];
+    signed char lit = (signed char) ptr[*pc+3];
+    int y = 0;
+    load_reg_to(vm, vB, (unsigned char*)&y);
+    y = y + lit;
+    store_to_reg(vm, vA, (unsigned char*)&y);
+    if ( is_verbose() ) printf("add-int/lit8 v%d, v%d, #%d = %d\n", vA, vB, (int)lit, y);
+    *pc = *pc + 4;
+    return 0;
+}
+// 0x28 goto +AA : 8-bit signed offset (以 16-bit code unit 計)  (format 10t)
+int op_goto( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
+{
+    signed char off = (signed char) ptr[*pc+1];
+    if ( is_verbose() ) printf("goto %+d (units)\n", (int)off);
+    *pc = *pc + off * 2;
+    return 0;
+}
+// 0x35 if-ge vA, vB, +CCCC : vA>=vB 則跳 (16-bit signed, code unit)  (format 22t)
+int op_if_ge( DexFileFormat *dex, simple_dalvik_vm *vm, u1 *ptr, int *pc )
+{
+    int vA = ptr[*pc+1] & 0x0F;
+    int vB = (ptr[*pc+1] >> 4) & 0x0F;
+    short off = (short)((ptr[*pc+3] << 8) | ptr[*pc+2]);
+    int x = 0, y = 0;
+    load_reg_to(vm, vA, (unsigned char*)&x);
+    load_reg_to(vm, vB, (unsigned char*)&y);
+    if ( x >= y ) {
+        if ( is_verbose() ) printf("if-ge v%d>=v%d (%d>=%d): branch %+d\n", vA, vB, x, y, (int)off);
+        *pc = *pc + off * 2;
+    } else {
+        if ( is_verbose() ) printf("if-ge v%d>=v%d (%d>=%d): fall through\n", vA, vB, x, y);
+        *pc = *pc + 4;
+    }
+    return 0;
+}
 byteCode byteCodes[] = {
     { "move-result-wide"  , 0x0B, 2,  op_move_result_wide },
     { "move-result-object", 0x0C, 2,  op_move_result_object },
@@ -705,7 +829,15 @@ byteCode byteCodes[] = {
     { "add-int/2addr"     , 0xb0, 2,  op_add_int_2addr},
     { "add-double/2addr"  , 0xcb, 2,  op_add_double_2addr},
     { "mul-double/2addr"  , 0xcd, 2,  op_mul_double_2addr},
-    { "div-int/lit8"      , 0xdb, 4,  op_div_int_lit8 }
+    { "div-int/lit8"      , 0xdb, 4,  op_div_int_lit8 },
+    { "new-array"         , 0x23, 4,  op_new_array },
+    { "aget"              , 0x44, 4,  op_aget },
+    { "aput"              , 0x4b, 4,  op_aput },
+    { "move"              , 0x01, 2,  op_move },
+    { "mul-int/2addr"     , 0xb2, 2,  op_mul_int_2addr },
+    { "add-int/lit8"      , 0xd8, 4,  op_add_int_lit8 },
+    { "goto"              , 0x28, 2,  op_goto },
+    { "if-ge"             , 0x35, 4,  op_if_ge }
 };
 static int byteCode_size = sizeof(byteCodes)/ sizeof(byteCode);
 

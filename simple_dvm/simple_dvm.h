@@ -227,6 +227,17 @@ typedef struct _invoke_parameters {
 typedef struct _simple_dvm_register {
     u1 data[4];
 } simple_dvm_register;
+
+/*
+ * 簡易 int 陣列 heap (對應 JVM 的 JvmArray): 支援 new-array / aget / aput。
+ * 暫存器存的是 handle (arrays[] 索引), 當作陣列參考。
+ */
+#define DVM_MAX_ARRAYS 64
+typedef struct _dvm_int_array {
+    int *data;
+    int  length;
+} dvm_int_array;
+
 typedef struct _simple_dalvik_vm {
     u1 heap[8192];
     u1 object_ref[4];
@@ -234,7 +245,8 @@ typedef struct _simple_dalvik_vm {
     invoke_parameters p ;
     u1 result[8];
     uint pc;
-    
+    dvm_int_array arrays[DVM_MAX_ARRAYS];
+    int array_count;
 } simple_dalvik_vm;
 
 // convert to int ok
