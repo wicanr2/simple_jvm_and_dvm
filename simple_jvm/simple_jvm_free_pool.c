@@ -21,9 +21,11 @@ void free_pools(JvmContext *ctx)
        free(method->attributes);
        memset( method, 0 , sizeof(MethodInfo));
     }
-    // 釋放 newarray 配置的 int 陣列
+    // 釋放 newarray 配置的 int / double 陣列
     for ( i = 0 ; i < ctx->array_count ; i++ ) {
         free( ctx->arrays[i].data );
+        free( ctx->arrays[i].ddata );
         ctx->arrays[i].data = 0;
+        ctx->arrays[i].ddata = 0;
     }
 }

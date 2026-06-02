@@ -234,8 +234,10 @@ typedef struct _simple_dvm_register {
  */
 #define DVM_MAX_ARRAYS 64
 typedef struct _dvm_int_array {
-    int *data;
-    int  length;
+    int    *data;      /* int 陣列 [I */
+    double *ddata;     /* double 陣列 [D */
+    int     length;
+    int     is_double;
 } dvm_int_array;
 
 typedef struct _simple_dalvik_vm {
