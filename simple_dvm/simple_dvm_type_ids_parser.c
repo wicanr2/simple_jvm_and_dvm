@@ -61,8 +61,10 @@ void parse_proto_ids(DexFileFormat *dex, unsigned char *buf, int offset) {
         }
         if ( dex->proto_id_item[i].parameters_off == 0 ) 
             continue;
-        printf(" proto_typ_list[%d] offset %p ",i, buf + dex->proto_id_item[i].parameters_off - sizeof(DexHeader));
-        memcpy( &dex->proto_type_list[i].size, 
+        if ( is_verbose() > 3 ) {
+            printf(" proto_typ_list[%d] offset %p ",i, buf + dex->proto_id_item[i].parameters_off - sizeof(DexHeader));
+        }
+        memcpy( &dex->proto_type_list[i].size,
                 buf + dex->proto_id_item[i].parameters_off - sizeof(DexHeader),
                 sizeof(int));
 
@@ -95,7 +97,9 @@ void parse_proto_ids(DexFileFormat *dex, unsigned char *buf, int offset) {
         } 
 
     }
-    printf("exit parse_proto_ids\n");
+    if ( is_verbose() > 3 ) {
+        printf("exit parse_proto_ids\n");
+    }
 }
 proto_id_item* get_proto_item( DexFileFormat *dex, int proto_id ) {
     if ( proto_id >= 0 && proto_id < dex->header.protoIdsSize) {

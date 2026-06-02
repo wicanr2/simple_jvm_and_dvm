@@ -1,0 +1,15 @@
+# build 產物
+/build/
+*.o
+*.exe
+
+# 執行 log / 反組譯輸出 (可重新產生)
+*.log
+log
+log1.txt
+Foo1_jvm_log.txt
+Foo1_dex_dasm.txt
+Foo1_java_dasm.txt
+
+# 測試暫存
+test/.tmp/

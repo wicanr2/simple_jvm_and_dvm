@@ -610,7 +610,7 @@ byteCode byteCodes[] = {
     { "sipush"          , 0x11, 3,  op_sipush           },
     { "return"          , 0xB1, 1,  op_return           }
 };
-static byteCode_size = sizeof(byteCodes)/ sizeof(byteCode);
+static int byteCode_size = sizeof(byteCodes)/ sizeof(byteCode);
 
 char *findOpCode( unsigned char op ) {
     int i = 0;

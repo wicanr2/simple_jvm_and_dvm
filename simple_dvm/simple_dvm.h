@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-typedef short u2;
+typedef unsigned short u2; /* DEX 規格中 u2 為 unsigned (修正原 signed short) */
 typedef unsigned int u4;
 typedef unsigned int uint;
 typedef unsigned char u1;

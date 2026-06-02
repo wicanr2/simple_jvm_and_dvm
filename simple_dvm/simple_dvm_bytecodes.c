@@ -716,7 +716,7 @@ byteCode byteCodes[] = {
     { "mul-double/2addr"  , 0xcd, 2,  op_mul_double_2addr},
     { "div-int/lit8"      , 0xdb, 4,  op_div_int_lit8 }
 };
-static byteCode_size = sizeof(byteCodes)/ sizeof(byteCode);
+static int byteCode_size = sizeof(byteCodes)/ sizeof(byteCode);
 
 
 opCodeFunc findOpCodeFunc( unsigned char op ) {
