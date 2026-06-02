@@ -12,8 +12,11 @@
 
 ## JVM 側 (`simple_jvm/`)
 
-- **JvmContext** — JVM 全部執行狀態的容器 (6 個 pool + stack + locals);由 `main` 擁有、
-  以指標顯式傳遞,取代原本的全域 pool。 _Avoid_: global pool、`simpleConstantPool` 等舊全域名。
+- **JvmContext** — JVM 全部執行狀態的容器 (6 個 pool + stack + locals + 陣列 heap);由 `main`
+  擁有、以指標顯式傳遞,取代原本的全域 pool。 _Avoid_: global pool、`simpleConstantPool` 等舊全域名。
+- **JvmArray / handle** — 一維 int 陣列的 heap 元素;**handle** 是它在 `JvmContext.arrays[]` 的
+  索引,當作「陣列參考」在 stack / 區域變數中流動 (非真正指標)。供 `newarray`/`iaload`/`iastore` 使用。
+- **GEMM** — 範例程式 (General Matrix Multiply, C = A×B);用來驗證陣列 + 迴圈 + 分支 opcode。
 - **ClassFileFormat** — 解析後的 `.class` 頂層結構 (magic / version / counts)。
 - **constant pool** — class 檔的常數表;本實作按 tag 分桶 (`SimpleConstantPool` 內 utf8CP / integerCP / method …)。 _Avoid_: CP (寫全名)。
 - **method pool / field pool / interface pool** — 對應 class 檔各區段的解析結果容器。

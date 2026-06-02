@@ -483,6 +483,115 @@ int op_return( JvmContext *ctx, unsigned char **opCode ) {
     return -1;
 }
 
+//==================================================================
+// 陣列 / 迴圈 opcode (GEMM 範例所需)
+//==================================================================
+// 0xBC newarray atype : 只支援 int 陣列; 以 handle (arrays[] 索引) 當參考
+int op_newarray( JvmContext *ctx, unsigned char **opCode ) {
+    int count = popInt(&ctx->stack);
+    int handle = ctx->array_count;
+    if ( handle < JVM_MAX_ARRAYS ) {
+        ctx->array_count++;
+        ctx->arrays[handle].length = count;
+        ctx->arrays[handle].data = (int*) calloc(count > 0 ? count : 1, sizeof(int));
+    }
+    pushInt(&ctx->stack, handle);
+    JVM_LOG("newarray int[%d] -> handle %d\n", count, handle);
+    *opCode = *opCode + 2;
+    return 0;
+}
+// 0x19 aload idx / 0x2C aload_2 / 0x2D aload_3 : 載入區域變數的陣列參考 (handle)
+int op_aload( JvmContext *ctx, unsigned char **opCode ) {
+    int index = opCode[0][1];
+    pushInt(&ctx->stack, ctx->locals.integer[index]);
+    *opCode = *opCode + 2;
+    return 0;
+}
+int op_aload_2( JvmContext *ctx, unsigned char **opCode ) {
+    pushInt(&ctx->stack, ctx->locals.integer[2]);
+    *opCode = *opCode + 1;
+    return 0;
+}
+int op_aload_3( JvmContext *ctx, unsigned char **opCode ) {
+    pushInt(&ctx->stack, ctx->locals.integer[3]);
+    *opCode = *opCode + 1;
+    return 0;
+}
+// 0x3A astore idx / 0x4D astore_2 / 0x4E astore_3 : 把陣列參考存進區域變數
+int op_astore( JvmContext *ctx, unsigned char **opCode ) {
+    int index = opCode[0][1];
+    ctx->locals.integer[index] = popInt(&ctx->stack);
+    *opCode = *opCode + 2;
+    return 0;
+}
+int op_astore_2( JvmContext *ctx, unsigned char **opCode ) {
+    ctx->locals.integer[2] = popInt(&ctx->stack);
+    *opCode = *opCode + 1;
+    return 0;
+}
+int op_astore_3( JvmContext *ctx, unsigned char **opCode ) {
+    ctx->locals.integer[3] = popInt(&ctx->stack);
+    *opCode = *opCode + 1;
+    return 0;
+}
+// 0x2E iaload : ..., arrayref, index -> value
+int op_iaload( JvmContext *ctx, unsigned char **opCode ) {
+    int index  = popInt(&ctx->stack);
+    int handle = popInt(&ctx->stack);
+    int value = 0;
+    if ( handle >= 0 && handle < ctx->array_count &&
+         index >= 0 && index < ctx->arrays[handle].length ) {
+        value = ctx->arrays[handle].data[index];
+    }
+    pushInt(&ctx->stack, value);
+    JVM_LOG("iaload a[%d][%d] = %d\n", handle, index, value);
+    *opCode = *opCode + 1;
+    return 0;
+}
+// 0x4F iastore : ..., arrayref, index, value ->
+int op_iastore( JvmContext *ctx, unsigned char **opCode ) {
+    int value  = popInt(&ctx->stack);
+    int index  = popInt(&ctx->stack);
+    int handle = popInt(&ctx->stack);
+    if ( handle >= 0 && handle < ctx->array_count &&
+         index >= 0 && index < ctx->arrays[handle].length ) {
+        ctx->arrays[handle].data[index] = value;
+    }
+    JVM_LOG("iastore a[%d][%d] = %d\n", handle, index, value);
+    *opCode = *opCode + 1;
+    return 0;
+}
+// 0x84 iinc idx, const : 區域變數遞增 (迴圈計數)
+int op_iinc( JvmContext *ctx, unsigned char **opCode ) {
+    int index = opCode[0][1];
+    signed char delta = (signed char) opCode[0][2];
+    ctx->locals.integer[index] += delta;
+    JVM_LOG("iinc local[%d] += %d -> %d\n", index, (int)delta, ctx->locals.integer[index]);
+    *opCode = *opCode + 3;
+    return 0;
+}
+// 0xA7 goto : 相對於指令起點的 16-bit signed offset
+int op_goto( JvmContext *ctx, unsigned char **opCode ) {
+    short offset = (short)((opCode[0][1] << 8) | opCode[0][2]);
+    JVM_LOG("goto offset %d\n", (int)offset);
+    *opCode = *opCode + offset;
+    return 0;
+}
+// 0xA2 if_icmpge : if value1 >= value2 branch, 否則 fall through (+3)
+int op_if_icmpge( JvmContext *ctx, unsigned char **opCode ) {
+    int value2 = popInt(&ctx->stack);
+    int value1 = popInt(&ctx->stack);
+    short offset = (short)((opCode[0][1] << 8) | opCode[0][2]);
+    if ( value1 >= value2 ) {
+        JVM_LOG("if_icmpge %d >= %d : branch %d\n", value1, value2, (int)offset);
+        *opCode = *opCode + offset;
+    } else {
+        JVM_LOG("if_icmpge %d >= %d : fall through\n", value1, value2);
+        *opCode = *opCode + 3;
+    }
+    return 0;
+}
+
 byteCode byteCodes[] = {
     { "aload_0"         , 0x2A, 1,  op_aload_0          },
     { "bipush"          , 0x10, 2,  op_bipush           },
@@ -518,7 +627,19 @@ byteCode byteCodes[] = {
     { "new"             , 0xBB, 3,  op_new              },
     { "irem"            , 0x70, 1,  op_irem             },
     { "sipush"          , 0x11, 3,  op_sipush           },
-    { "return"          , 0xB1, 1,  op_return           }
+    { "return"          , 0xB1, 1,  op_return           },
+    { "newarray"        , 0xBC, 2,  op_newarray         },
+    { "aload"           , 0x19, 2,  op_aload            },
+    { "aload_2"         , 0x2C, 1,  op_aload_2          },
+    { "aload_3"         , 0x2D, 1,  op_aload_3          },
+    { "astore"          , 0x3A, 2,  op_astore           },
+    { "astore_2"        , 0x4D, 1,  op_astore_2         },
+    { "astore_3"        , 0x4E, 1,  op_astore_3         },
+    { "iaload"          , 0x2E, 1,  op_iaload           },
+    { "iastore"         , 0x4F, 1,  op_iastore          },
+    { "iinc"            , 0x84, 3,  op_iinc             },
+    { "goto"            , 0xA7, 3,  op_goto             },
+    { "if_icmpge"       , 0xA2, 3,  op_if_icmpge        }
 };
 static int byteCode_size = sizeof(byteCodes)/ sizeof(byteCode);
 

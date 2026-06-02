@@ -51,6 +51,7 @@ run_one() {
 
 run_one jvm_Foo1       build/simple_jvm       Foo1.class
 run_one dvm_Foo1       build/simple_dvm       Foo1.dex
+run_one jvm_GEMM       build/simple_jvm       GEMM.class
 run_one jvm_Foo1_debug build/simple_jvm_debug Foo1.class
 run_one dvm_Foo1_debug build/simple_dvm_debug Foo1.dex
 

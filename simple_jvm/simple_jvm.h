@@ -373,6 +373,16 @@ typedef struct _LocalVariables{
 }LocalVariables;
 //-----------------------------------
 /*
+ * 簡易 int 陣列 heap: 支援 newarray / iaload / iastore。
+ * 陣列以 handle (在 arrays[] 的索引) 當參考, 存進區域變數 / 堆疊。
+ */
+#define JVM_MAX_ARRAYS 256
+typedef struct _JvmArray {
+    int *data;
+    int  length;
+} JvmArray;
+//-----------------------------------
+/*
  * JVM 執行情境: 把原本散落的 6 個全域 pool 收進單一 context, 由 main 擁有並
  * 顯式傳遞 (對齊 DVM 的 DexFileFormat / simple_dalvik_vm 指標風格), 移除全域可變狀態。
  *
@@ -386,6 +396,8 @@ typedef struct _JvmContext {
     SimpleMethodPool    method_pool;
     StackFrame          stack;
     LocalVariables      locals;
+    JvmArray            arrays[JVM_MAX_ARRAYS];
+    int                 array_count;
 } JvmContext;
 //-----------------------------------
 // byte Codes
