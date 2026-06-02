@@ -1,0 +1,39 @@
+open file Foo1.class
+method attributes_count = 1
+method tmp->attribute_name_index = 37
+method tmp->attribute_length = 29
+method attributes_count = 1
+method tmp->attribute_name_index = 37
+method tmp->attribute_length = 878
+-------------------------------------
+Execute Simple JVM
+-------------------------------------
+-------------------------------------
+find and execute <init> method
+-------------------------------------
+HelloWorld
+--------------------
+initial value 
+random number x : 34
+x = 34
+y = 6345
+c = 0
+d = 23456
+f = 0
+--------------------
+c = x + y = 34 + 6345 = 6379
+d = d + c = 29835
+x = c/2 = 3189
+c = x * y = 3189 * 6345 = 20234205
+d = d + c = 20264040
+x = c/2 = 10117102
+c = x - y = 10117102 - 6345 = 10110757
+d = d + c = 30374797
+x = c/2 = 5055378
+c = x / y = 5055378 / 6345 = 796
+d = d + c = 30375593
+f = 30375593 + 5055378 + 6345 + 796 = 35438112
+Foo Test By WJY
+-------------------------------------
+Terminate Simple JVM
+-------------------------------------

@@ -2,9 +2,8 @@
 
 void parse_encoded_method(
         DexFileFormat *dex, 
-        unsigned char *buf, encoded_method *method ) 
+        unsigned char *buf, encoded_method *method )
 {
-    int i = 0;
     int offset = 0;
 
     if ( is_verbose() > 3 ) {
@@ -41,7 +40,6 @@ void parse_class_data_item (
     int i = 0;
     int j = 0;
     int size = 0;
-    int len = 0;
     i = offset ;
 
     dex->class_data_item[index].static_fields_size = 
@@ -80,10 +78,10 @@ void parse_class_data_item (
         dex->class_data_item[index].direct_methods = (encoded_method*)
             malloc( sizeof( encoded_method ) * 
                     dex->class_data_item[index].direct_methods_size);
-        for ( j = 0 ; j < dex->class_data_item[index].direct_methods_size; j++ )
+        for ( j = 0 ; j < (int)dex->class_data_item[index].direct_methods_size; j++ )
         {
             if ( is_verbose() > 3 ) {
-                printf("offset = %04x ", i + sizeof(DexHeader));
+                printf("offset = %04x ", (unsigned)(i + sizeof(DexHeader)));
             }
             dex->class_data_item[index].direct_methods[j].method_idx_diff = 
                 get_uleb128_len ( buf, i, &size );
@@ -114,7 +112,7 @@ void parse_class_data_item (
 
 void parse_class_defs(DexFileFormat *dex, unsigned char *buf, int offset) {
     int i = 0;
-    printf("parse class defs offset = %04x\n", offset + sizeof(DexHeader) );
+    printf("parse class defs offset = %04x\n", (unsigned)(offset + sizeof(DexHeader)) );
     if ( dex->header.classDefsSize <= 0 ) {
         return ;
     }
@@ -123,7 +121,7 @@ void parse_class_defs(DexFileFormat *dex, unsigned char *buf, int offset) {
     dex->class_data_item= malloc(
             sizeof( class_data_item ) * dex->header.classDefsSize);
 
-    for ( i = 0 ; i < dex->header.classDefsSize; i++ ) { 
+    for ( i = 0 ; i < (int)dex->header.classDefsSize; i++ ) {
         memcpy ( &dex->class_def_item[i], 
                 buf + i*sizeof(class_def_item) + offset, 
                 sizeof(class_def_item) ); 

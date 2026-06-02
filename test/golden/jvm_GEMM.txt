@@ -1,0 +1,18 @@
+open file GEMM.class
+method attributes_count = 1
+method tmp->attribute_name_index = 18
+method tmp->attribute_length = 414
+-------------------------------------
+Execute Simple JVM
+-------------------------------------
+-------------------------------------
+find and execute <init> method
+-------------------------------------
+GEMM 2x2 : C = A x B
+c[0] = 19
+c[1] = 22
+c[2] = 43
+c[3] = 50
+-------------------------------------
+Terminate Simple JVM
+-------------------------------------

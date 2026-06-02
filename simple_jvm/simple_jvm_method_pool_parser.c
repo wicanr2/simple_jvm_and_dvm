@@ -3,14 +3,9 @@
 #include <string.h>
 #include "simple_jvm.h"
 
-extern SimpleInterfacePool simpleInterfacePool;
-extern SimpleFieldPool simpleFieldPool;
-extern SimpleMethodPool simpleMethodPool;
-extern SimpleConstantPool simpleConstantPool;
 
 int parseMethodAttr(MethodInfo *ptr, FILE *fp ) {
-    int i = 0; 
-    int j = 0;
+    int i = 0;
     AttributeInfo *tmp = 0;
     unsigned char short_tmp[2];
     unsigned char integer_tmp[4];
@@ -29,12 +24,12 @@ int parseMethodAttr(MethodInfo *ptr, FILE *fp ) {
         tmp->info = (unsigned char *) malloc(sizeof(unsigned char) * tmp->attribute_length );
         fread( tmp->info, tmp->attribute_length, 1, fp );
     }
+    return 0;
 } 
 // parse Method Pool
-int parseMP( FILE *fp ) {
-    int i = 0;
+int parseMP( JvmContext *ctx, FILE *fp ) {
     unsigned char short_tmp[2];
-    MethodInfo *ptr = &simpleMethodPool.method[ simpleMethodPool.method_used ];
+    MethodInfo *ptr = &ctx->method_pool.method[ ctx->method_pool.method_used ];
 
     // access flag
     fread( short_tmp, 2, 1, fp );
@@ -56,7 +51,7 @@ int parseMP( FILE *fp ) {
     memset( ptr->attributes, 0, sizeof ( AttributeInfo ) * ptr->attributes_count );
     // parse method attributes
     parseMethodAttr( ptr, fp );
-    simpleMethodPool.method_used++;
+    ctx->method_pool.method_used++;
     return 0;
 }
 /*
@@ -67,12 +62,11 @@ MethodInfo *findMethodInPool(
         SimpleMethodPool *mp,
         char *method_name, int size ) {
     int i = 0;
-    int cmp_size = 0;
     if ( mp->method_used > 0 ) {
         for ( i = 0 ; i < mp->method_used ; i++ ) {
             ConstantUTF8 *name = findUTF8(p, mp->method[i].name_index );
             if ( size == name->string_size ) {
-                if ( strncmp ( method_name , name->ptr , size ) == 0 )
+                if ( strncmp ( method_name , (char *)name->ptr , size ) == 0 )
                     return &mp->method[i];
             }
         }
@@ -110,7 +104,6 @@ void printMethodPool( SimpleConstantPool *p, SimpleMethodPool *mp) {
             for ( i = 0 ; i < mp->method_used ; i++ ) {
                 ConstantUTF8 *ptr = findUTF8(p, mp->method[i].name_index );
                 ConstantUTF8 *ptr2 = findUTF8(p, mp->method[i].descriptor_index);
-                ConstantMethodRef *mRefPtr = findMethodRef( p, mp->method[i].name_index );
                 printf("method[%d], attr_count = %d, %d",
                         i, mp->method[i].attributes_count, 
                         mp->method[i].name_index
@@ -175,10 +168,10 @@ void printMethodPool( SimpleConstantPool *p, SimpleMethodPool *mp) {
             }
     }
 }
-int parseMethodPool(FILE *fp, int count) {
+int parseMethodPool(JvmContext *ctx, FILE *fp, int count) {
     int i = 0; 
     for ( i = 0 ; i < count ; i ++ ) {
-        parseMP(fp);
+        parseMP(ctx, fp);
     }
     return 0;
 }

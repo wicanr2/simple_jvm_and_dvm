@@ -16,6 +16,16 @@
 typedef unsigned short u2;
 typedef unsigned char byte;
 
+/*
+ * Debug log: SIMPLE_JVM_DEBUG 有定義時展開為 printf, 否則為 no-op (零開銷)。
+ * 取代散落各 op 的 #if SIMPLE_JVM_DEBUG ... printf ... #endif。
+ */
+#ifdef SIMPLE_JVM_DEBUG
+#define JVM_LOG(...) printf(__VA_ARGS__)
+#else
+#define JVM_LOG(...) ((void)0)
+#endif
+
 //---------------------------------
 /*
  Simple Java Class File 
@@ -267,8 +277,11 @@ typedef struct _SimpleMethodPool {
     int method_used;
 }SimpleMethodPool ;
 //-----------------------------------
-// constant pool parser 
-int parseConstantPool(FILE *fp, int count);
+/* 前向宣告; 完整定義在 LocalVariables 之後 (需先有各 pool / StackFrame 型別) */
+typedef struct _JvmContext JvmContext;
+//-----------------------------------
+// constant pool parser
+int parseConstantPool(JvmContext *ctx, FILE *fp, int count);
 void printConstantPool( SimpleConstantPool *p );
 ConstantUTF8 *findUTF8( SimpleConstantPool *p , int index );
 ConstantStringRef *findStringRef( SimpleConstantPool *p , int index );
@@ -284,17 +297,17 @@ double get_double_from_constant_pool( SimpleConstantPool *p, int index );
 /*
  *  Interface Pool Parser
  */
-int parseInterfacePool(FILE *fp, int count);
+int parseInterfacePool(JvmContext *ctx, FILE *fp, int count);
 void printInterfacePool( SimpleConstantPool *p, SimpleInterfacePool *ip);
 /*
  *  Field Pool Parser
  */
-int parseFieldPool(FILE *fp, int count);
+int parseFieldPool(JvmContext *ctx, FILE *fp, int count);
 void printFieldPool( SimpleConstantPool *p, SimpleFieldPool *fp);
 /*
  *  Method Pool Parser
  */
-int parseMethodPool(FILE *fp, int count);
+int parseMethodPool(JvmContext *ctx, FILE *fp, int count);
 void printMethodPool( SimpleConstantPool *p, SimpleMethodPool *fp);
 MethodInfo *findMethodInPool(
         SimpleConstantPool *p,
@@ -309,13 +322,13 @@ void printCodeAttribute( CodeAttribute *ca, SimpleConstantPool *p );
 /*
  * Java Class File Parser
  */
-int parseJavaClassFile( char *file, ClassFileFormat *cff );
+int parseJavaClassFile( JvmContext *ctx, char *file, ClassFileFormat *cff );
 void printClassFileFormat(ClassFileFormat *cff);
 char* getMajorVersionString(u2 major_number);
 /*
  * Free Pools 
  */
-void free_pools();
+void free_pools(JvmContext *ctx);
 //-----------------------------------
 /*
  * Stack Frame
@@ -359,8 +372,36 @@ typedef struct _LocalVariables{
     int integer[10];
 }LocalVariables;
 //-----------------------------------
+/*
+ * 簡易 int 陣列 heap: 支援 newarray / iaload / iastore。
+ * 陣列以 handle (在 arrays[] 的索引) 當參考, 存進區域變數 / 堆疊。
+ */
+#define JVM_MAX_ARRAYS 256
+typedef struct _JvmArray {
+    int *data;
+    int  length;
+} JvmArray;
+//-----------------------------------
+/*
+ * JVM 執行情境: 把原本散落的 6 個全域 pool 收進單一 context, 由 main 擁有並
+ * 顯式傳遞 (對齊 DVM 的 DexFileFormat / simple_dalvik_vm 指標風格), 移除全域可變狀態。
+ *
+ * op 函式統一以 (JvmContext *ctx, unsigned char **opCode) 為介面, 由 ctx 取得
+ * stack / constant_pool / locals 等狀態。
+ */
+typedef struct _JvmContext {
+    SimpleConstantPool  constant_pool;
+    SimpleInterfacePool interface_pool;
+    SimpleFieldPool     field_pool;
+    SimpleMethodPool    method_pool;
+    StackFrame          stack;
+    LocalVariables      locals;
+    JvmArray            arrays[JVM_MAX_ARRAYS];
+    int                 array_count;
+} JvmContext;
+//-----------------------------------
 // byte Codes
-typedef int (*opCodeFunc) (unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p );
+typedef int (*opCodeFunc) (JvmContext *ctx, unsigned char **opCode );
 
 
 typedef struct _byteCode {
@@ -369,7 +410,7 @@ typedef struct _byteCode {
     int offset;
     opCodeFunc func; 
 } byteCode;
-int executeMethod( MethodInfo *startup, StackFrame *stack, SimpleConstantPool *p );
+int executeMethod( JvmContext *ctx, MethodInfo *startup );
 char *findOpCode( unsigned char op );
 opCodeFunc findOpCodeFunc( unsigned char op ) ;
 int findOpCodeOffset( unsigned char op );

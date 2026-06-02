@@ -3,13 +3,11 @@
 #include <string.h>
 #include "simple_jvm.h"
 
-extern SimpleInterfacePool simpleInterfacePool;
-extern SimpleConstantPool simpleConstantPool;
 
 // parse Interface Pool Class 
-int parseIPClass( FILE *fp, int index ) {
+int parseIPClass( JvmContext *ctx, FILE *fp, int index ) {
     unsigned char short_tmp[2];
-    ConstantClassRef *ptr = &simpleInterfacePool.clasz[ simpleInterfacePool.clasz_used ];
+    ConstantClassRef *ptr = &ctx->interface_pool.clasz[ ctx->interface_pool.clasz_used ];
 
     ptr->tag = CONSTANT_CLASS;
     ptr->index = index;
@@ -18,7 +16,8 @@ int parseIPClass( FILE *fp, int index ) {
     fread( short_tmp, 2, 1, fp );
     ptr->stringIndex = short_tmp[0] << 8 | short_tmp[1];
 
-    simpleInterfacePool.clasz_used++;
+    ctx->interface_pool.clasz_used++;
+    return 0;
 }
 
 void printInterfacePool( SimpleConstantPool *p, SimpleInterfacePool *ip) {
@@ -46,10 +45,10 @@ void printInterfacePool( SimpleConstantPool *p, SimpleInterfacePool *ip) {
             }
     }
 }
-int parseInterfacePool(FILE *fp, int count) {
+int parseInterfacePool(JvmContext *ctx, FILE *fp, int count) {
     int i = 0; 
     for ( i = 1 ; i < count ; i ++ ) {
-        parseIPClass(fp,1);
+        parseIPClass(ctx, fp,1);
     }
     return 0;
 }

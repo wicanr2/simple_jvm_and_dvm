@@ -3,10 +3,6 @@
 #include <string.h>
 #include "simple_jvm.h"
 
-extern SimpleInterfacePool simpleInterfacePool;
-extern SimpleFieldPool simpleFieldPool;
-extern SimpleConstantPool simpleConstantPool;
-extern SimpleMethodPool simpleMethodPool; 
 /*
  Get Major Version String
  */
@@ -52,7 +48,7 @@ void printClassFileFormat(ClassFileFormat *cff)
 /*
  Parse Class File 
  */
-int parseJavaClassFile( char *file, ClassFileFormat *cff ) {
+int parseJavaClassFile( JvmContext *ctx, char *file, ClassFileFormat *cff ) {
     FILE *fp = 0;
     unsigned char short_tmp[2];
     fp = fopen(file,"rb");
@@ -78,7 +74,7 @@ int parseJavaClassFile( char *file, ClassFileFormat *cff ) {
     
     //printf("constant pool file offset = %04x\n", ftell  ( fp ) );
     // constant pool table
-    parseConstantPool(fp, cff->constant_pool_count);
+    parseConstantPool(ctx, fp, cff->constant_pool_count);
     //printf("access flags file offset = %04x\n", ftell  ( fp ) );
 
     // access flag
@@ -98,21 +94,21 @@ int parseJavaClassFile( char *file, ClassFileFormat *cff ) {
     cff->interface_count = short_tmp[0] << 8 | short_tmp[1] ;
 
     // interface pool table
-    parseInterfacePool(fp, cff->interface_count);
+    parseInterfacePool(ctx, fp, cff->interface_count);
 
     // field count
     fread( short_tmp, 2, 1, fp);
     cff->fields_count = short_tmp[0] << 8 | short_tmp[1] ;
 
     // field pool table
-    parseFieldPool(fp , cff->fields_count);
+    parseFieldPool(ctx, fp , cff->fields_count);
 
     // method count
     fread( short_tmp, 2, 1, fp);
     cff->methods_count = short_tmp[0] << 8 | short_tmp[1] ;
     
     // method pool table
-    parseMethodPool(fp, cff->methods_count);
+    parseMethodPool(ctx, fp, cff->methods_count);
 
     fclose(fp);
     return 0;

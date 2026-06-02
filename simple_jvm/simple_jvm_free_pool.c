@@ -3,20 +3,16 @@
 #include <string.h>
 #include "simple_jvm.h"
 
-extern SimpleInterfacePool simpleInterfacePool;
-extern SimpleFieldPool simpleFieldPool;
-extern SimpleConstantPool simpleConstantPool;
-extern SimpleMethodPool simpleMethodPool; 
 
 
-void free_pools() 
+void free_pools(JvmContext *ctx) 
 {
     int i = 0;
-    int j, k = 0;
+    int j;
     MethodInfo *method =0;
     AttributeInfo *attr = 0;
-    for ( i = 0 ; i < simpleMethodPool.method_used; i++ ) {
-        method = &simpleMethodPool.method[i];
+    for ( i = 0 ; i < ctx->method_pool.method_used; i++ ) {
+        method = &ctx->method_pool.method[i];
         for( j = 0 ; j < method->attributes_count ; j++ ) {
             attr = &method->attributes[j];
             free( attr->info );
@@ -24,5 +20,10 @@ void free_pools()
         }
        free(method->attributes);
        memset( method, 0 , sizeof(MethodInfo));
+    }
+    // 釋放 newarray 配置的 int 陣列
+    for ( i = 0 ; i < ctx->array_count ; i++ ) {
+        free( ctx->arrays[i].data );
+        ctx->arrays[i].data = 0;
     }
 }
