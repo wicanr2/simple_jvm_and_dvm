@@ -376,8 +376,8 @@ typedef struct _LocalVariables{
  * JVM 執行情境: 把原本散落的 6 個全域 pool 收進單一 context, 由 main 擁有並
  * 顯式傳遞 (對齊 DVM 的 DexFileFormat / simple_dalvik_vm 指標風格), 移除全域可變狀態。
  *
- * 過渡說明: op 函式仍同時收到 stack/p 參數 (= &ctx->stack / &ctx->constant_pool)
- * 作為便利存取, 與 ctx 內欄位重複; 之後可逐步收斂掉。
+ * op 函式統一以 (JvmContext *ctx, unsigned char **opCode) 為介面, 由 ctx 取得
+ * stack / constant_pool / locals 等狀態。
  */
 typedef struct _JvmContext {
     SimpleConstantPool  constant_pool;
@@ -389,7 +389,7 @@ typedef struct _JvmContext {
 } JvmContext;
 //-----------------------------------
 // byte Codes
-typedef int (*opCodeFunc) (unsigned char **opCode, StackFrame *stack, SimpleConstantPool *p, JvmContext *ctx );
+typedef int (*opCodeFunc) (JvmContext *ctx, unsigned char **opCode );
 
 
 typedef struct _byteCode {
