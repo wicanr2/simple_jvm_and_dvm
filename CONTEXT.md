@@ -34,6 +34,8 @@
 - **simple_dalvik_vm** — DVM 執行狀態:`heap`、`regs[32]` register bank、`result`、`pc`。 _Avoid_: 把 register bank 叫 stack (Dalvik 是 register-based)。
 - **invoke_parameters** — `35c` 形式呼叫的參數打包 (method_id + reg 列表)。
 - **uleb128** — dex 用的可變長度無號整數編碼。
+- **dvm_int_array** — DVM 的一維 int 陣列 heap 元素 (對應 JVM 的 [[JvmContext|JvmArray]]);
+  暫存器存 handle 當陣列參考。供 `new-array`/`aget`/`aput` 使用。GEMMDvm 範例驗證。
 
 ## 型別別名 (注意)
 

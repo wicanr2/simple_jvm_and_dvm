@@ -1,175 +1,242 @@
-# Simple JVM & Dalvik VM
+# Simple JVM & Dalvik VM — 用 C 看懂虛擬機怎麼跑 bytecode
 
-教學用的精簡 Java 虛擬機 (JVM) 與 Dalvik 虛擬機 (DVM),以 C 撰寫,給入門班理解 VM 如何
-解析 class / dex 檔並執行 bytecode。刻意「夠用就好」:以整數運算為主,不追求完整規格。
+這是一個**教學用**的精簡 Java 虛擬機 (JVM) 與 Android Dalvik 虛擬機 (DVM),以 C 撰寫。
+目標只有一個:**讓初學者真正看懂「一個 `.class` / `.dex` 檔是怎麼被讀進來、然後一行一行
+執行的」**。它刻意「夠用就好」(以整數運算為主),不是完整、不追求效能,但每個環節都看得到、改得動。
 
-> 原作者: Chun-Yu Wang (wicanr2@gmail.com), 2013。本版加上跨平台 build、回歸測試與 repo 整理。
+> 原作者: Chun-Yu Wang (wicanr2@gmail.com), 2013。
+> 本版加上跨平台 build、確定性回歸測試、repo 整理,以及一個 **GEMM (矩陣乘法) 範例** —
+> 同一個演算法分別在 JVM 與 DVM 上跑,用來對照兩種虛擬機最根本的差異。
 
-## 專案結構
+---
+
+## 1. 先建立直覺:什麼是虛擬機 / bytecode?
+
+你寫的 `Foo.java` 不會直接被 CPU 執行。流程是這樣:
 
 ```
-simple_jvm/    JVM: 解析 .class → 跑 <init> bytecode
-simple_dvm/    DVM: 解析 .dex   → 跑 Dalvik bytecode
-test/          golden 回歸測試 (run_golden.sh + golden/)
-Foo1.java      範例程式; Foo1.class / Foo1.dex 為其編譯產物 (測試 fixture)
-GEMM.java      矩陣乘法範例 (陣列 + 巢狀迴圈); GEMM.class 為測試 fixture
-examples/      與 VM 無關的小範例 (c_cpp_linkage)
-lib/           smali / baksmali / dx (Windows 端重新產生 dex 的工具)
-Makefile       build 規則
-Dockerfile     編譯環境 (gcc:13)
-build.sh       在 docker 內跑 make 的包裝
+   Foo.java  ──(javac 編譯)──▶  Foo.class   ──(JVM 執行)──▶  輸出
+  (人看的原始碼)              (一串 bytecode)            (一行一行解釋執行)
 ```
 
-兩個 VM 各自獨立、自包,parser 依 concern 一檔 (constant_pool / method / field /
-string_ids / type_ids …),方便逐塊閱讀。詳見 `CONTEXT.md` 的術語表。
+- **bytecode**:一種「給虛擬機看的中間語言」,比機器碼好懂、又跟 CPU 無關 → 所以 Java 能
+  「一次編譯,到處執行」。每個指令叫一個 **opcode** (例如 `iadd` = 整數相加)。
+- **虛擬機 (VM)**:一支程式,負責把 bytecode 一個一個讀出來解釋執行。本專案就是用 C 寫了
+  兩支這樣的程式。
 
-## Build (docker-first)
+Android 不用標準 JVM,而是用 **Dalvik VM**,吃的是 `.dex` 檔。`.dex` 由 `.class` 再轉一手:
 
-```bash
-./build.sh          # build simple_jvm + simple_dvm → build/
-./build.sh debug    # 帶 -DSIMPLE_*_DEBUG 的 debug 版
-./build.sh clean
+```
+  Foo.java ─javac─▶ Foo.class ─dx─▶ Foo.dex ─(Dalvik VM 執行)─▶ 輸出
 ```
 
-`build.sh` 會以目前使用者身分在 `gcc:13` 容器內跑 `make`,不污染系統環境。
-若環境已有 gcc/make,也可直接 `make`。
+---
 
-## 執行
+## 2. 最關鍵的一課:Stack-based (JVM) vs Register-based (Dalvik)
 
-```bash
-build/simple_jvm Foo1.class
-build/simple_jvm GEMM.class
-build/simple_dvm Foo1.dex
+兩種 VM 最根本的差別,是**運算元 (operand) 放在哪裡**:
+
+| | **JVM (堆疊機)** | **Dalvik (暫存器機)** |
+|---|---|---|
+| 運算元放哪 | 一個 **operand stack**,push/pop | 一組 **虛擬暫存器** v0, v1, v2 … |
+| 指令長相 | 不帶位置,隱含對堆疊頂端操作 | 直接指名暫存器 |
+| `c = a + b` | `iload a; iload b; iadd; istore c` | `add-int vc, va, vb` |
+| 指令數 | 多 (一堆 push/pop) | 少 (一條搞定) |
+| 指令大小 | 小 (1 byte 居多) | 大 (常 2~6 bytes) |
+
+**用 GEMM 內層的 `sum += a[i*n+k] * b[k*n+j]` 親眼對照** (本專案兩個範例編出來的真實 bytecode):
+
+```
+── JVM (stack-based,什麼都先丟上堆疊) ──        ── Dalvik (register-based,直接指名暫存器) ──
+  iload  7        // 把 sum 推上堆疊                mul-int      v8, v4, v10   // v8 = i*n
+  aload_2         // 把陣列 a 推上堆疊              add-int/2addr v8, v0       // v8 = v8 + k
+  iload 5; iload_1; imul; iload 8; iadd            aget         v8, v5, v8    // v8 = a[v8]
+                  //   堆疊上算出 i*n+k             mul-int      v9, v0, v10   // v9 = k*n
+  iaload          // a[i*n+k] (取代堆疊頂兩項)      add-int/2addr v9, v3       // v9 = v9 + j
+  aload_3; iload 8; iload_1; imul; iload 6; iadd   aget         v9, v6, v9    // v9 = b[v9]
+  iaload          // b[k*n+j]                       mul-int/2addr v8, v9       // v8 = v8 * v9
+  imul            // a[..] * b[..]                  add-int/2addr v2, v8       // sum(v2) += v8
+  iadd            // sum + ...
+  istore 7        // 存回 sum
 ```
 
-## 測試
+看出來了嗎?**同一行 Java,JVM 用「把東西搬上搬下堆疊」表達,Dalvik 用「對暫存器直接動手」
+表達**。這就是兩種 VM 設計哲學的核心,也是 Android 當年選 register-based 的理由之一
+(指令數少、解譯迴圈跑得快,適合早期手機)。
 
-```bash
-./build.sh test     # build 後跑 golden 回歸測試
+本專案的兩支 VM,程式結構也忠實反映這個差別:
+- `simple_jvm` 裡有 `StackFrame` (operand stack) + `pushInt/popInt`。
+- `simple_dvm` 裡有 `regs[32]` (暫存器組) + `load_reg_to/store_to_reg`。
+
+---
+
+## 3. 這支 toy VM 內部怎麼運作?
+
+不管 JVM 或 DVM,骨架都是三步,對照原始碼很好讀:
+
+1. **Parse (解析檔案)** — 把 `.class` / `.dex` 的二進位結構讀成 C struct。
+   每個區段一個 parser 檔,例如 `simple_jvm_constant_pool_parser.c`、`simple_dvm_string_ids_parser.c`。
+2. **Dispatch table (查表分派)** — 一張 `{ 名稱, opcode, 長度, 處理函式 }` 的表 (`byteCodes[]`)。
+   讀到一個 opcode byte,就查表找到對應的 C 函式。
+3. **Execute loop (執行迴圈)** — 從進入點方法的 code 開始,讀一個 opcode → 執行 → 推進 `pc`
+   (program counter,指向下一條指令),直到方法結束。**分支 (迴圈/if) 就是改 `pc`**。
+
+```c
+// 執行迴圈的精神 (簡化自 executeMethod / runMethod)
+while (還有指令) {
+    opcode = code[pc];
+    func   = 查表(opcode);     // dispatch table
+    func(...);                 // 執行,函式內部會更新 pc (一般 +指令長度;分支則跳)
+}
 ```
 
-測試以固定亂數種子 (`SVM_SEED`) 跑兩個 VM,比對輸出與 `test/golden/` 下的已知良好輸出。
-**刻意**改動行為後要更新基準:
+> 入口慣例:本 toy **JVM 執行 `<init>` (建構子)**,本 toy **DVM 執行 `main`**。這是這兩支
+> 教學程式各自的簡化選擇,不是 Java 規範 — 範例程式因此把邏輯放在不同方法 (見下)。
 
-```bash
-UPDATE=1 ./test/run_golden.sh   # (需先 make all, 或在 docker 內)
+---
+
+## 4. GEMM 範例 — 同一個矩陣乘法,兩台 VM 都跑得動
+
+`GEMM.java` (JVM 版) / `GEMMDvm.java` (DVM 版) 計算 **C = A × B** 的 2×2 整數矩陣乘法,
+用來示範 VM 如何執行 **陣列 + 巢狀迴圈** 的 bytecode。兩者算出同一個答案:
+
 ```
-
-### 為什麼需要 SVM_SEED
-
-`java.lang.Math.random` 用 `srand(time(0))`,輸出本來每次不同,無法回歸測試。
-設環境變數 `SVM_SEED=<n>` 可固定種子讓輸出可重現;未設時維持原本的 `time(0)` 行為。
-
-## GEMM 範例 — 在 Simple JVM 上跑矩陣乘法
-
-`GEMM.java` 是一個 **General Matrix Multiply** (C = A × B) 範例,示範這台 VM 如何執行
-**陣列 + 巢狀迴圈** 的 bytecode。為了支援它,VM 新增了陣列與分支類 opcode (見下)。
+A = [[1,2],[3,4]]   B = [[5,6],[7,8]]   ⇒   C = [[19,22],[43,50]]
+```
 
 ```java
-class GEMM {
-    GEMM() {                       // 邏輯放在建構子: 本 VM 執行 <init>
-        int n = 2;
-        int[] a = new int[4];      // A = [[1,2],[3,4]]  (row-major 1D 陣列)
-        int[] b = new int[4];      // B = [[5,6],[7,8]]
-        int[] c = new int[4];
-        a[0]=1; a[1]=2; a[2]=3; a[3]=4;
-        b[0]=5; b[1]=6; b[2]=7; b[3]=8;
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++) {
-                int sum = 0;
-                for (int k = 0; k < n; k++)
-                    sum = sum + a[i*n+k] * b[k*n+j];
-                c[i*n+j] = sum;
-            }
-        System.out.println("GEMM 2x2 : C = A x B");
-        System.out.println("c[0] = " + c[0]);   // 19
-        System.out.println("c[1] = " + c[1]);   // 22
-        System.out.println("c[2] = " + c[2]);   // 43
-        System.out.println("c[3] = " + c[3]);   // 50
+// 演算法本體 (兩版相同;JVM 版放在建構子 <init>,DVM 版放在 main)
+int n = 2;
+int[] a = {1,2,3,4};   // row-major: a[i*n+j]
+int[] b = {5,6,7,8};
+int[] c = new int[4];
+for (int i = 0; i < n; i++)
+    for (int j = 0; j < n; j++) {
+        int sum = 0;
+        for (int k = 0; k < n; k++)
+            sum += a[i*n+k] * b[k*n+j];   // 內積
+        c[i*n+j] = sum;
     }
-}
+// 之後用 System.out.println 印出 c[0..3]
 ```
 
 執行:
 
 ```bash
-build/simple_jvm GEMM.class
-# GEMM 2x2 : C = A x B
-# c[0] = 19   c[1] = 22   c[2] = 43   c[3] = 50   (與真實 JVM 一致)
+build/simple_jvm GEMM.class      # JVM (stack-based) 版
+build/simple_dvm GEMMDvm.dex     # Dalvik (register-based) 版
+# 兩者都輸出 c[0]=19  c[1]=22  c[2]=43  c[3]=50
 ```
 
-### 它怎麼運作
+### 為了跑 GEMM,兩台 VM 各補了哪些 opcode
 
-**1. 編譯管線**
+原本兩台 VM 只夠跑「直線型」的算術 + 列印。GEMM 需要**陣列**和**迴圈 (= 分支)**,所以各補上:
 
-```
-GEMM.java --(javac, JDK 8)--> GEMM.class --(simple_jvm)--> 執行 <init> 的 bytecode
-```
+| 能力 | JVM 新增 (stack) | Dalvik 新增 (register) |
+|---|---|---|
+| 配置陣列 | `newarray` | `new-array` |
+| 讀 / 寫陣列元素 | `iaload` / `iastore` | `aget` / `aput` |
+| 載入 / 存放陣列參考 | `aload(_2/_3)` / `astore(_2/_3)` | `move` |
+| 迴圈計數 | `iinc` | `add-int/lit8` |
+| 條件 / 無條件跳轉 | `if_icmpge` / `goto` | `if-ge` / `goto` |
 
-用 **JDK 8** 編譯是刻意的: JDK 9+ 會把字串串接 (`"c[0] = " + c[0]`) 編成 `invokedynamic`
-(StringConcatFactory),本 VM 不支援;JDK 8 編成 `StringBuilder` 序列,正好對應 VM 既有的
-列印路徑 (與 Foo1 相同)。重新產生:
+> **陣列怎麼做的**:兩台 VM 都沒有真正的物件模型,所以用一個極簡的 **int 陣列 heap** —
+> `newarray` 配一塊記憶體,回傳它的索引 (**handle**) 當作「陣列參考」,在堆疊 / 暫存器裡流動;
+> `iaload`/`aget` 等再用 handle 找到陣列存取 (含邊界檢查)。對教學夠用且安全,但沒有 GC、
+> 不支援多維 / 物件陣列。
+>
+> **分支怎麼做的**:opcode 收到目前指令的位置,bytecode 裡的 offset 是相對位移,把它加到
+> `pc` 就跳到目標。Dalvik 的 offset 以 **16-bit code unit** 計 (要 ×2 換成 byte),JVM 以 byte 計。
+
+### 重新產生 class / dex (需 docker,符合本專案 docker-first 原則)
+
+字串串接 (`"c = " + x`) 必須用 **JDK 8** 編譯:JDK 9+ 會編成 `invokedynamic`,本 VM 不支援;
+JDK 8 編成 `StringBuilder` 序列,正好對應 VM 既有的列印路徑。`.dex` 還要再用 `dx` (見 `lib/`)
+從 `.class` 轉,而 `dx 2.0.2` 只吃到 Java 6 (`-target 1.6`):
 
 ```bash
+# JVM: GEMM.java -> GEMM.class
 docker run --rm -v "$PWD":/w -w /w eclipse-temurin:8-jdk javac GEMM.java
+# DVM: GEMMDvm.java -> GEMMDvm.class -> GEMMDvm.dex
+docker run --rm -v "$PWD":/w -v "$PWD/lib":/jars -w /w eclipse-temurin:8-jdk bash -c \
+  'javac -source 1.6 -target 1.6 GEMMDvm.java && java -jar /jars/dx.jar --dex --output=GEMMDvm.dex GEMMDvm.class'
 ```
 
-**2. 為什麼邏輯放在建構子**
+---
 
-`simple_jvm_main.c` 只尋找並執行名為 `<init>` 的方法 (見 `findMethodInPool(... "<init>" ...)`),
-所以範例把運算寫在建構子本體 (而非 `static main`),javac 會把它編進 `<init>`。
+## 5. 專案結構
 
-**3. 陣列模型 (handle-based heap)**
-
-VM 原本只有 operand stack + `int locals[10]`,沒有物件/陣列概念。新增一個極簡 int 陣列 heap
-在 `JvmContext` 裡:
-
-```c
-typedef struct { int *data; int length; } JvmArray;
-// JvmContext: JvmArray arrays[256]; int array_count;
+```
+simple_jvm/    JVM: 解析 .class → 跑 <init> 的 bytecode (stack-based)
+simple_dvm/    DVM: 解析 .dex   → 跑 main 的 bytecode   (register-based)
+test/          golden 回歸測試 (run_golden.sh / run_e2e.sh + golden/)
+Foo1.java      基本範例 (算術 + 列印);Foo1.class / Foo1.dex 為 fixture
+GEMM.java      JVM 版矩陣乘法 (陣列+迴圈);GEMM.class 為 fixture
+GEMMDvm.java   DVM 版矩陣乘法;GEMMDvm.dex 為 fixture
+examples/      與 VM 無關的小範例 (c_cpp_linkage)
+lib/           smali / baksmali / dx (產生 / 反組譯 dex 的工具)
+Makefile / Dockerfile / build.sh   docker-first build
+CONTEXT.md     術語表 (ubiquitous language)
+docs/          重構報告
 ```
 
-- `newarray` → `calloc` 一塊 int 陣列,把它在 `arrays[]` 的索引 (**handle**) 當作「陣列參考」push 上 stack。
-- `astore_N` / `aload_N` → 把 handle 存進 / 取出區域變數 (與 int 共用 `locals.integer[]`)。
-- `iaload` (`..., ref, index → value`) / `iastore` (`..., ref, index, value →`) → 用 handle 找到陣列再存取,**含邊界檢查**。
+每個 parser 依 concern 切一檔,方便逐塊閱讀。術語見 `CONTEXT.md`。
 
-也就是說「陣列參考」在這台 VM 裡其實是一個小整數 handle,而非真正的指標 — 對教學夠用且安全。
+## 6. Build (docker-first)
 
-**4. 迴圈 = 分支 opcode**
+```bash
+./build.sh          # build simple_jvm + simple_dvm → build/
+./build.sh debug    # 帶 -DSIMPLE_*_DEBUG 的 debug 版 (印出每條指令的細節)
+./build.sh clean
+```
 
-`for` 迴圈被 javac 編成計數器 + 條件分支。VM 新增三個 opcode 完成它:
+`build.sh` 以目前使用者身分在 `gcc:13` 容器內跑 `make`,不污染系統。若本機已有 gcc/make,
+也可直接 `make`。
 
-- `iinc idx, const` → 區域變數原地遞增 (迴圈計數 `i++`)。
-- `if_icmpge target` → pop 兩個 int,`value1 >= value2` 就跳到 target,否則往下 (`for` 的離開條件)。
-- `goto target` → 無條件跳回迴圈頭。
+## 7. 執行
 
-分支怎麼跳: op 收到的 `opCode` 指向**目前指令的起點**,bytecode 裡的 offset 是相對位移,
-所以 `*opCode += (signed16)offset` 就落在目標指令。`executeMethod` 的主迴圈每次重讀 `pc[0]`
-分派,分支只是改 `*opCode`,不需要額外機制。
+```bash
+build/simple_jvm Foo1.class
+build/simple_jvm GEMM.class
+build/simple_dvm Foo1.dex
+build/simple_dvm GEMMDvm.dex
+build/simple_dvm Foo1.dex 4      # 第二個參數 = verbose level,印出每條指令的執行細節 (很適合學習!)
+```
 
-**5. 列印沿用既有路徑**
+> 想看 VM「一條一條怎麼跑」,用 debug build 或 DVM 的 verbose level — 會印出每個 opcode 對
+> 堆疊 / 暫存器做了什麼,是理解 bytecode 最直接的方式。
 
-`System.out.println("c[0] = " + c[0])` 走的是 `getstatic` (System.out) → `new`/`dup`/`invokespecial`
-(StringBuilder) → `invokevirtual append` → `invokevirtual println`,與 Foo1 完全相同的序列,
-不需新增 opcode。差別只在 append 的 int 來自 `iaload` (陣列載入) 而非 `iload`。
+## 8. 測試
 
-### 為了 GEMM 新增的 opcode
+```bash
+./build.sh test     # build 後跑 golden 回歸 (6 個案例: Foo1/GEMM × JVM/DVM + debug)
+./build.sh e2e      # 完整 e2e (含 JVM==DVM 結果一致性檢查)
+```
 
-| opcode | 0x | 作用 |
-|---|---|---|
-| `newarray` | BC | 配置 int 陣列,push handle |
-| `aload` / `aload_2` / `aload_3` | 19 / 2C / 2D | 載入陣列參考 (handle) |
-| `astore` / `astore_2` / `astore_3` | 3A / 4D / 4E | 儲存陣列參考 |
-| `iaload` / `iastore` | 2E / 4F | 陣列元素讀 / 寫 (含邊界檢查) |
-| `iinc` | 84 | 區域變數原地遞增 |
-| `if_icmpge` / `goto` | A2 / A7 | 條件 / 無條件分支 (迴圈) |
+golden 測試以固定亂數種子 `SVM_SEED` 跑,比對輸出與 `test/golden/` 的已知良好結果。**刻意**
+改動行為後更新基準:`UPDATE=1 ./test/run_golden.sh`。
 
-`GEMM.class` 的輸出已納入 golden 回歸 (`test/golden/jvm_GEMM.txt`),`./build.sh test` 會驗證。
+### 為什麼需要 SVM_SEED
 
-## 已知限制 (教學取捨)
+`Math.random` 用 `srand(time(0))`,輸出每次不同,無法回歸測試。設 `SVM_SEED=<n>` 可固定種子
+讓輸出可重現;未設時維持原 `time(0)` 行為。
+
+## 9. 已知限制 (教學取捨)
 
 - 以整數運算為主,型別系統不完整。
 - 固定大小的 pool / register bank (例: `regs[32]`、`utf8CP[200]`),未做動態擴張。
-- 僅實作範例程式 (Foo1 / GEMM) 用到的 bytecode 與 `java.lang.*` 子集。
-- 陣列只支援 **一維 int 陣列** (handle-based,無真正物件模型 / GC / 多維 / 物件陣列)。
-- 字串串接需用 JDK 8 編譯 (依賴 `StringBuilder` 序列,不支援 JDK 9+ 的 `invokedynamic`)。
+- 僅實作範例 (Foo1 / GEMM) 用到的 bytecode 與 `java.lang.*` 子集。
+- 陣列只支援 **一維 int 陣列** (handle-based,無物件模型 / GC / 多維 / 物件陣列)。
+- 字串串接需 JDK 8 編譯;`.dex` 需 `dx` 以 `-target 1.6` 產生。
+- DVM 的方法查找是為範例結構簡化的 (`class_idx = i-1`),換複雜程式可能要調整。
+
+## 10. 名詞速查
+
+- **opcode** — 一條 bytecode 指令的數值碼 (如 `iadd`=0x60)。
+- **operand stack** — JVM 放運算元的堆疊 (stack-based 的核心)。
+- **register (vN)** — Dalvik 放運算元的虛擬暫存器 (register-based 的核心)。
+- **constant pool** — class 檔裡的常數表 (字串、數字、方法/欄位參考)。
+- **pc (program counter)** — 指向「下一條要執行的指令」的位置;分支 = 改 pc。
+- **handle** — 本 VM 用來代表「陣列參考」的小整數 (陣列在 heap 表中的索引)。
+
+延伸閱讀:JVM 規範的 instruction set、Dalvik 的 `dalvik-bytecode` 文件,以及 `CONTEXT.md`。
