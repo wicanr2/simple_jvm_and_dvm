@@ -592,6 +592,82 @@ int op_if_icmpge( JvmContext *ctx, unsigned char **opCode ) {
     return 0;
 }
 
+//==================================================================
+// 位元 / 一元 / 比較分支 opcode (Ops 範例所需)
+//==================================================================
+// 0x7E iand / 0x80 ior / 0x82 ixor : pop v2,v1 -> push (v1 op v2)
+int op_iand( JvmContext *ctx, unsigned char **opCode ) {
+    int v2 = popInt(&ctx->stack);
+    int v1 = popInt(&ctx->stack);
+    pushInt(&ctx->stack, v1 & v2);
+    JVM_LOG("iand: %d & %d = %d\n", v1, v2, v1 & v2);
+    *opCode = *opCode + 1;
+    return 0;
+}
+int op_ior( JvmContext *ctx, unsigned char **opCode ) {
+    int v2 = popInt(&ctx->stack);
+    int v1 = popInt(&ctx->stack);
+    pushInt(&ctx->stack, v1 | v2);
+    JVM_LOG("ior: %d | %d = %d\n", v1, v2, v1 | v2);
+    *opCode = *opCode + 1;
+    return 0;
+}
+int op_ixor( JvmContext *ctx, unsigned char **opCode ) {
+    int v2 = popInt(&ctx->stack);
+    int v1 = popInt(&ctx->stack);
+    pushInt(&ctx->stack, v1 ^ v2);
+    JVM_LOG("ixor: %d ^ %d = %d\n", v1, v2, v1 ^ v2);
+    *opCode = *opCode + 1;
+    return 0;
+}
+// 0x74 ineg : pop v -> push -v
+int op_ineg( JvmContext *ctx, unsigned char **opCode ) {
+    int v = popInt(&ctx->stack);
+    pushInt(&ctx->stack, -v);
+    JVM_LOG("ineg: -%d\n", v);
+    *opCode = *opCode + 1;
+    return 0;
+}
+// 0x99 ifeq : pop v; v==0 則跳 (16-bit signed byte offset) 否則 +3
+int op_ifeq( JvmContext *ctx, unsigned char **opCode ) {
+    int v = popInt(&ctx->stack);
+    short offset = (short)((opCode[0][1] << 8) | opCode[0][2]);
+    if ( v == 0 ) {
+        JVM_LOG("ifeq %d==0 : branch %d\n", v, (int)offset);
+        *opCode = *opCode + offset;
+    } else {
+        JVM_LOG("ifeq %d==0 : fall through\n", v);
+        *opCode = *opCode + 3;
+    }
+    return 0;
+}
+// 0xA3 if_icmpgt : value1 > value2 則跳
+int op_if_icmpgt( JvmContext *ctx, unsigned char **opCode ) {
+    int value2 = popInt(&ctx->stack);
+    int value1 = popInt(&ctx->stack);
+    short offset = (short)((opCode[0][1] << 8) | opCode[0][2]);
+    if ( value1 > value2 ) {
+        *opCode = *opCode + offset;
+    } else {
+        *opCode = *opCode + 3;
+    }
+    JVM_LOG("if_icmpgt %d > %d\n", value1, value2);
+    return 0;
+}
+// 0xA4 if_icmple : value1 <= value2 則跳
+int op_if_icmple( JvmContext *ctx, unsigned char **opCode ) {
+    int value2 = popInt(&ctx->stack);
+    int value1 = popInt(&ctx->stack);
+    short offset = (short)((opCode[0][1] << 8) | opCode[0][2]);
+    if ( value1 <= value2 ) {
+        *opCode = *opCode + offset;
+    } else {
+        *opCode = *opCode + 3;
+    }
+    JVM_LOG("if_icmple %d <= %d\n", value1, value2);
+    return 0;
+}
+
 byteCode byteCodes[] = {
     { "aload_0"         , 0x2A, 1,  op_aload_0          },
     { "bipush"          , 0x10, 2,  op_bipush           },
@@ -639,7 +715,14 @@ byteCode byteCodes[] = {
     { "iastore"         , 0x4F, 1,  op_iastore          },
     { "iinc"            , 0x84, 3,  op_iinc             },
     { "goto"            , 0xA7, 3,  op_goto             },
-    { "if_icmpge"       , 0xA2, 3,  op_if_icmpge        }
+    { "if_icmpge"       , 0xA2, 3,  op_if_icmpge        },
+    { "iand"            , 0x7E, 1,  op_iand             },
+    { "ior"             , 0x80, 1,  op_ior              },
+    { "ixor"            , 0x82, 1,  op_ixor             },
+    { "ineg"            , 0x74, 1,  op_ineg             },
+    { "ifeq"            , 0x99, 3,  op_ifeq             },
+    { "if_icmpgt"       , 0xA3, 3,  op_if_icmpgt        },
+    { "if_icmple"       , 0xA4, 3,  op_if_icmple        }
 };
 static int byteCode_size = sizeof(byteCodes)/ sizeof(byteCode);
 

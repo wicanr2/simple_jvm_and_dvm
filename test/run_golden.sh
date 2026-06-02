@@ -53,6 +53,8 @@ run_one jvm_Foo1       build/simple_jvm       Foo1.class
 run_one dvm_Foo1       build/simple_dvm       Foo1.dex
 run_one jvm_GEMM       build/simple_jvm       GEMM.class
 run_one dvm_GEMM       build/simple_dvm       GEMMDvm.dex
+run_one jvm_Ops        build/simple_jvm       Ops.class
+run_one dvm_Ops        build/simple_dvm       OpsDvm.dex
 run_one jvm_Foo1_debug build/simple_jvm_debug Foo1.class
 run_one dvm_Foo1_debug build/simple_dvm_debug Foo1.dex
 
